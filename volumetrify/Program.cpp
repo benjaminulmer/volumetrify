@@ -40,6 +40,19 @@ void Program::start() {
 		exit(EXIT_FAILURE);
 	}
 
+	// Test stuff here
+	//****************
+
+	std::vector<SphCoord> poly;
+	poly.push_back(SphCoord(glm::dvec3(-1, 1, -1)));
+	poly.push_back(SphCoord(glm::dvec3(1, 1, -1)));
+	poly.push_back(SphCoord(glm::dvec3(1, 1, 1)));
+	poly.push_back(SphCoord(glm::dvec3(-1, 1, 1)));
+	std::cout << SphCoord::volumeCell(poly, 1.0, 0.5) << std::endl;
+
+	// *****************
+	// End testing stuff
+
 	camera = new Camera();
 	renderEngine = new RenderEngine(window);
 	InputHandler::setUp(camera, renderEngine, this);

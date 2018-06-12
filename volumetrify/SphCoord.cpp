@@ -208,3 +208,33 @@ bool SphCoord::greatCircleArcLatIntersect(const SphCoord& a0, const SphCoord& a1
 		return false;
 	}
 }
+
+// Assumes no angles are greater than 180 deg - fine for now, maybe should be updated later
+double SphCoord::angleSum(const std::vector<SphCoord>& points) {
+	
+	double sum = 0.0;
+	for (int i = 1; i <= points.size(); i++) {
+
+		SphCoord v1 = points[i - 1];
+		SphCoord v0 = points[i % points.size()];
+		SphCoord v2 = points[(i + 1) % points.size()];
+
+		glm::dvec3 plane1 = glm::normalize(glm::cross(v0.toCartesian(1.0), v1.toCartesian(1.0)));
+		glm::dvec3 plane2 = glm::normalize(glm::cross(v0.toCartesian(1.0), v2.toCartesian(1.0)));
+
+		sum += acos(glm::dot(plane1, plane2));
+	}
+	return sum;
+}
+
+
+double SphCoord::areaPolygon(const std::vector<SphCoord>& points, double radius) {
+	double sum = angleSum(points);
+	return (sum - (points.size() - 2) * M_PI) * radius * radius;
+}
+
+
+double SphCoord::volumeCell(const std::vector<SphCoord>& points, double maxRad, double minRad) {
+	double sum = angleSum(points);
+	return (sum - (points.size() - 2) * M_PI) * (maxRad * maxRad * maxRad - minRad * minRad * minRad) / 3.0;
+}
