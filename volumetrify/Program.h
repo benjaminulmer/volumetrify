@@ -7,6 +7,7 @@
 
 #include "Camera.h"
 #include "RenderEngine.h"
+#include "TestGrid.h"
 
 enum class RadialBound {
 	MAX,
@@ -21,10 +22,24 @@ public:
 
 	void start();
 
+	void updateRenderable();
+
 	void updateRotation(int oldX, int newX, int oldY, int newY, bool skew);
 	void updateScale(int inc);
 
+	void toggleCurved();
+	void toggleVolume();
+	void updateSL(int inc);
+
 private:
+	TestGrid g;
+	TestGrid v;
+
+	const int maxSL = 6;
+	bool curved;
+	bool volume;
+	int sl;
+
 	SDL_Window* window;
 	int width, height;
 
@@ -42,11 +57,6 @@ private:
 	double longRot;
 
 	void setupWindow();
-	void insertAirSigmets();
-	void insertWind();
-
-	void airSigRender1();
-	void windRender1();
 
 	void mainLoop();
 };

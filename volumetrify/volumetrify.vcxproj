@@ -167,6 +167,7 @@
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="SphCoord.h" />
     <ClInclude Include="ShaderTools.h" />
+    <ClInclude Include="TestGrid.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +182,7 @@
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="SphCoord.cpp" />
     <ClCompile Include="ShaderTools.cpp" />
+    <ClCompile Include="TestGrid.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>

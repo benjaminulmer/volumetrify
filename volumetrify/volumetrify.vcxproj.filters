@@ -50,6 +50,9 @@
     <ClInclude Include="SphCoord.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TestGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Program.cpp">
@@ -86,6 +89,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SphCoord.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

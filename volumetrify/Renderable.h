@@ -24,6 +24,7 @@ public:
 	Renderable(const rapidjson::Document& d);
 
 	void doubleToFloats();
+	void clear();
 
 	std::vector<glm::dvec3> verts;
 

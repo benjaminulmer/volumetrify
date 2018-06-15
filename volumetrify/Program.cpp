@@ -25,6 +25,10 @@ Program::Program() {
 	longRot = 0;
 	latRot = 0;
 
+	curved = true;
+	volume = false;
+	sl = 0;
+
 	width = height = 800;
 }
 
@@ -39,19 +43,6 @@ void Program::start() {
 		system("pause");
 		exit(EXIT_FAILURE);
 	}
-
-	// Test stuff here
-	//****************
-
-	std::vector<SphCoord> poly;
-	poly.push_back(SphCoord(glm::dvec3(-1, 1, -1)));
-	poly.push_back(SphCoord(glm::dvec3(1, 1, -1)));
-	poly.push_back(SphCoord(glm::dvec3(1, 1, 1)));
-	poly.push_back(SphCoord(glm::dvec3(-1, 1, 1)));
-	std::cout << SphCoord::volumeCell(poly, 1.0, 0.5) << std::endl;
-
-	// *****************
-	// End testing stuff
 
 	camera = new Camera();
 	renderEngine = new RenderEngine(window);
@@ -69,10 +60,30 @@ void Program::start() {
 
 	// Draw stuff
 	grid.drawMode = GL_LINES;
-	grid.doubleToFloats();
-	RenderEngine::setBufferData(grid, false);
+
+	// Subdivide grid and create renderable
+	for (int i = 0; i < maxSL; i++) {
+		g.subdivide(false);
+		v.subdivide(true);
+	}
+	updateRenderable();
 
 	mainLoop();
+}
+
+
+void Program::updateRenderable() {
+
+	grid.clear();
+
+	const auto& map = (volume) ? v.map : g.map;
+	for (auto p : map) {
+		if (p.first.length() != sl + 1 || p.first[0] != 'a') continue;
+		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
+	}
+
+	grid.doubleToFloats();
+	RenderEngine::setBufferData(grid, false);
 }
 
 
@@ -138,7 +149,6 @@ void Program::mainLoop() {
 
 // Updates camera rotation
 // Locations are in pixel coordinates
-#include <iomanip>
 void Program::updateRotation(int oldX, int newX, int oldY, int newY, bool skew) {
 
 	glm::dmat4 projView = renderEngine->getProjection() * camera->getLookAt();
@@ -178,23 +188,13 @@ void Program::updateRotation(int oldX, int newX, int oldY, int newY, bool skew) 
 		double longNew = atan2(iPosNew.x, iPosNew.z);
 		double latNew = M_PI_2 - acos(iPosNew.y / sphereRad);
 
-
-		std::cout << "pixel old: (" << oldXN << ", " << oldYN << ")\t" << "pixel new: (" << newXN << ", " << newYN << ")" << std::endl;
-		
-
 		if (skew) {
 			camera->updateLatitudeRotation(latNew - latOld);
 		}
 		else {
 			latRot += latNew - latOld;
 			longRot += longNew - longOld;
-
-			std::cout << std::setprecision(10) << latRot << " : " << longRot << std::endl;
 		}
-	}
-	else {
-		std::cout << "no ray intersect" << std::endl;
-		glm::intersectRaySphere(rayO, rayDOld, sphereO, sphereRad, iPosOld, iNorm);
 	}
 }
 
@@ -209,4 +209,24 @@ void Program::updateScale(int inc) {
 		scale *= 1.4f;
 	}
 	camera->setScale(scale);
+}
+
+
+void Program::toggleCurved() {
+	curved = !curved;
+	updateRenderable();
+}
+
+
+void Program::toggleVolume() {
+	volume = !volume;
+	updateRenderable();
+}
+
+
+void Program::updateSL(int inc) {
+	sl += inc;
+	sl = std:: min(sl, maxSL);
+	sl = std::max(sl, 0);
+	updateRenderable();
 }

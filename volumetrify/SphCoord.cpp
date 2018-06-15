@@ -236,5 +236,5 @@ double SphCoord::areaPolygon(const std::vector<SphCoord>& points, double radius)
 
 double SphCoord::volumeCell(const std::vector<SphCoord>& points, double maxRad, double minRad) {
 	double sum = angleSum(points);
-	return (sum - (points.size() - 2) * M_PI) * (maxRad * maxRad * maxRad - minRad * minRad * minRad) / 3.0;
+	return (sum - (points.size() - 2) * M_PI) * (pow(maxRad, 3) - pow(minRad, 3)) / 3.0;
 }

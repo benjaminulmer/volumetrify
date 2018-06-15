@@ -43,3 +43,11 @@ void Renderable::doubleToFloats() {
 		vertsLow.push_back(v - (glm::dvec3)high);
 	}
 }
+
+
+void Renderable::clear() {
+	verts.clear();
+	colours.clear();
+	vertsHigh.clear();
+	vertsLow.clear();
+}

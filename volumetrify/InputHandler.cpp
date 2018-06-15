@@ -48,6 +48,18 @@ void InputHandler::key(SDL_KeyboardEvent& e) {
 		if (key == SDLK_f) {
 			renderEngine->toggleFade();
 		}
+		else if (key == SDLK_UP) {
+			program->updateSL(1);
+		}
+		else if (key == SDLK_DOWN) {
+			program->updateSL(-1);
+		}
+		else if (key == SDLK_c) {
+			program->toggleCurved();
+		}
+		else if (key == SDLK_v) {
+			program->toggleVolume();
+		}
 		else if (key == SDLK_ESCAPE) {
 			SDL_Quit();
 			exit(0);
@@ -72,7 +84,8 @@ void InputHandler::motion(SDL_MouseMotionEvent& e) {
 		program->updateRotation(mouseOldX, e.x, mouseOldY, e.y, false);
 	}
 	else if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
-		program->updateRotation(mouseOldX, e.x, mouseOldY, e.y, true);
+		camera->translate(glm::vec3(-dx, dy, 0.f));
+		//program->updateRotation(mouseOldX, e.x, mouseOldY, e.y, true);
 	}
 
 	// Update current position of the mouse
