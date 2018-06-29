@@ -8,18 +8,13 @@ void Cell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved)
 	r.lineColour = colour;
 	glm::dvec3 o(0.0);
 
-	//if (maxRad = 6371000.0 * (4.0 / 3.0)) {
-	//	Geometry::createArcR(v0.toCartesian(maxRad), v1.toCartesian(maxRad), o, r);
-	//	Geometry::createArcR(v0.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
-	//	Geometry::createArcR(v1.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
-	//}
-	if (v0.longitude == 0.0 && v1.longitude == 0.0) {
-		Geometry::createArcR(v0.toCartesian(maxRad), v1.toCartesian(maxRad), o, r);
-	}
+	Geometry::createArcR(v0.toCartesian(maxRad), v1.toCartesian(maxRad), o, r);
+	Geometry::createArcR(v0.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
+	Geometry::createArcR(v1.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
 
-	//Geometry::createArcR(v0.toCartesian(minRad), v1.toCartesian(minRad), o, r);
-	//Geometry::createArcR(v0.toCartesian(minRad), v2.toCartesian(minRad), o, r);
-	//Geometry::createArcR(v1.toCartesian(minRad), v2.toCartesian(minRad), o, r);
+	Geometry::createArcR(v0.toCartesian(minRad), v1.toCartesian(minRad), o, r);
+	Geometry::createArcR(v0.toCartesian(minRad), v2.toCartesian(minRad), o, r);
+	Geometry::createArcR(v1.toCartesian(minRad), v2.toCartesian(minRad), o, r);
 
 	if (!curved) {
 		r.lineColour = glm::vec3(1.f, 0.f, 0.f);
@@ -33,15 +28,9 @@ void Cell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved)
 		r.lineColour = colour;
 	}
 
-	if (v0.longitude == 0.0) {
-		Geometry::createLineR(v0.toCartesian(maxRad), v0.toCartesian(minRad), r);
-	}
-	if (v1.longitude == 0.0) {
-		Geometry::createLineR(v1.toCartesian(maxRad), v1.toCartesian(minRad), r);
-	}
-	if (v2.longitude == 0.0) {
-		Geometry::createLineR(v2.toCartesian(maxRad), v2.toCartesian(minRad), r);
-	}
+	Geometry::createLineR(v0.toCartesian(maxRad), v0.toCartesian(minRad), r);
+	Geometry::createLineR(v1.toCartesian(maxRad), v1.toCartesian(minRad), r);
+	Geometry::createLineR(v2.toCartesian(maxRad), v2.toCartesian(minRad), r);
 }
 
 TestGrid::TestGrid() {
@@ -100,9 +89,9 @@ TestGrid::TestGrid() {
 	curDepth = 1;
 }
 
-#include <iostream>
+
 void TestGrid::subdivide(bool volume) {
-	std::cout << std::endl;
+
 	for (auto p : map) {
 		if (p.first.length() != curDepth) continue;
 
@@ -144,34 +133,6 @@ void TestGrid::subdivide(bool volume) {
 		n4.v0 = mid01;
 		n4.v1 = mid02;
 		n4.v2 = mid12;
-
-		if (p.first.length() % 2 == 1) {
-			Cell top1 = n1;
-			top1.maxRad = c.maxRad;
-			top1.minRad = c.minRad;
-			top1.cellType = c.cellType;
-
-			Cell top2 = n2;
-			top2.maxRad = c.maxRad;
-			top2.minRad = c.minRad;
-			top2.cellType = c.cellType;
-
-			Cell top3 = n3;
-			top3.maxRad = c.maxRad;
-			top3.minRad = c.minRad;
-			top3.cellType = c.cellType;
-
-			Cell top4 = n4;
-			top4.maxRad = c.maxRad;
-			top4.minRad = c.minRad;
-			top4.cellType = c.cellType;
-
-			map[p.first + "0"] = top1;
-			map[p.first + "1"] = top2;
-			map[p.first + "2"] = top3;
-			map[p.first + "3"] = top4;
-			continue;
-		}
 
 		Cell top1 = n1;
 		top1.maxRad = c.maxRad;

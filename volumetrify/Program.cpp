@@ -80,16 +80,7 @@ void Program::updateRenderable() {
 	const auto& map = (volume) ? v.map : g.map;
 	for (auto p : map) {
 		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
-		
-		//if (p.first[0] == 'a' && p.first[1] == '0') {
-		//	if (p.first.length() != sl + 1) continue;
-		//	
-		//else if (p.first == "a4") {
-		//	p.second.fillRenderable(grid, glm::vec3(0.6f, 0.6f, 0.6f), curved);
-		//}
-		//else {
 
-		//}
 		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
 		
 	}

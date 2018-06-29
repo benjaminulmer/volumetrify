@@ -15,8 +15,6 @@ Camera::Camera() : zoomScale(1.3), rotScale(0.008) {
 // Returns view matrix for the camera
 glm::dmat4 Camera::getLookAt() const {
 
-	std::cout << "Scale: " << curScale << "\tLong: " << longitudeRotRad << "\tLat: " << latitudeRotRad << "\tTrans: " << translation.x << ", " << translation.y << ", " << translation.z << std::endl;
-
 	// Rotate eye along longitude
 	glm::dvec3 eyeTemp = glm::rotateY(eye, -longitudeRotRad);
 
@@ -59,16 +57,10 @@ glm::dvec3 Camera::getLookDir() const {
 // Sets current model scale
 void Camera::setScale(double scale) {
 	curScale = scale;
-
-	//eye = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW * scale + 30.0);
-	//centre = glm::dvec3(0.0, 0.0, 0.0);
-	//latitudeRotRad = 0.0;
 }
 
 // Rotates camera along longitudinal axis (spherical coords)
 void Camera::updateLongitudeRotation(double rad) {
-	//longitudeRotRad += rad;
-
 
 	// If camera is upside down reverse longitude rotations
 	if (cos(latitudeRotRad) > 0) {
@@ -81,9 +73,6 @@ void Camera::updateLongitudeRotation(double rad) {
 
 // Rotates camera along latitudinal axis (spherical coords)
 void Camera::updateLatitudeRotation(double rad) {
-	//latitudeRotRad -= rad;
-
-
 	latitudeRotRad += rad * M_PI / 180;
 }
 
@@ -124,7 +113,6 @@ void Camera::reset() {
 	eye = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW + 30.0);
 	up = glm::dvec3(0.0, 1.0, 0.0);
 	centre = glm::dvec3(0.0, 0.0, 0.0);
-
 
 	bool side = true;
 
