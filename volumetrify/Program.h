@@ -27,8 +27,10 @@ public:
 	void updateRotation(int oldX, int newX, int oldY, int newY, bool skew);
 	void updateScale(int inc);
 
+	// VOLUME
 	void toggleCurved();
 	void toggleVolume();
+	void toggleFullSphere();
 	void updateSL(int inc);
 
 private:
@@ -38,6 +40,7 @@ private:
 	const int maxSL = 6;
 	bool curved;
 	bool volume;
+	bool fullSphere;
 	int sl;
 
 	SDL_Window* window;

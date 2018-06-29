@@ -60,6 +60,9 @@ void InputHandler::key(SDL_KeyboardEvent& e) {
 		else if (key == SDLK_v) {
 			program->toggleVolume();
 		}
+		else if (key == SDLK_s) {
+			program->toggleFullSphere();
+		}
 		else if (key == SDLK_ESCAPE) {
 			SDL_Quit();
 			exit(0);
@@ -79,13 +82,12 @@ void InputHandler::motion(SDL_MouseMotionEvent& e) {
 	dx = e.x - mouseOldX;
 	dy = e.y - mouseOldY;
 
-	// left mouse button moves camera
 	if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-		program->updateRotation(mouseOldX, e.x, mouseOldY, e.y, false);
+		camera->updateLongitudeRotation(dx * 0.5f);
+		camera->updateLatitudeRotation(dy * 0.5f);
 	}
 	else if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
-		camera->translate(glm::vec3(-dx, dy, 0.f));
-		//program->updateRotation(mouseOldX, e.x, mouseOldY, e.y, true);
+		camera->translate(glm::vec3(0.1f * -dx, 0.1f * dy, 0.f));
 	}
 
 	// Update current position of the mouse
@@ -117,8 +119,8 @@ void InputHandler::scroll(SDL_MouseWheelEvent& e) {
 		//program->updateRadialBounds(RadialBound::BOTH, -dy);
 	}
 	else {
-		program->updateScale(-dy);
-		//camera->updateZoom(dy);
+		//program->updateScale(-dy);
+		camera->updateZoom(dy);
 	}
 }
 

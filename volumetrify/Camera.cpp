@@ -11,8 +11,11 @@ Camera::Camera() : zoomScale(1.3), rotScale(0.008) {
 	reset();
 }
 
+#include <iostream>
 // Returns view matrix for the camera
 glm::dmat4 Camera::getLookAt() const {
+
+	std::cout << "Scale: " << curScale << "\tLong: " << longitudeRotRad << "\tLat: " << latitudeRotRad << "\tTrans: " << translation.x << ", " << translation.y << ", " << translation.z << std::endl;
 
 	// Rotate eye along longitude
 	glm::dvec3 eyeTemp = glm::rotateY(eye, -longitudeRotRad);
@@ -57,19 +60,31 @@ glm::dvec3 Camera::getLookDir() const {
 void Camera::setScale(double scale) {
 	curScale = scale;
 
-	eye = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW * scale + 30.0);
-	centre = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW * scale);
-	latitudeRotRad = 0.0;
+	//eye = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW * scale + 30.0);
+	//centre = glm::dvec3(0.0, 0.0, 0.0);
+	//latitudeRotRad = 0.0;
 }
 
 // Rotates camera along longitudinal axis (spherical coords)
 void Camera::updateLongitudeRotation(double rad) {
-	longitudeRotRad += rad;
+	//longitudeRotRad += rad;
+
+
+	// If camera is upside down reverse longitude rotations
+	if (cos(latitudeRotRad) > 0) {
+		longitudeRotRad += rad * M_PI / 180;
+	}
+	else {
+		longitudeRotRad -= rad * M_PI / 180;
+	}
 }
 
 // Rotates camera along latitudinal axis (spherical coords)
 void Camera::updateLatitudeRotation(double rad) {
-	latitudeRotRad -= rad;
+	//latitudeRotRad -= rad;
+
+
+	latitudeRotRad += rad * M_PI / 180;
 }
 
 // Zooms camera in or out (+1 or -1)
@@ -108,10 +123,23 @@ void Camera::translate(const glm::dvec3& planeTranslation) {
 void Camera::reset() {
 	eye = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW + 30.0);
 	up = glm::dvec3(0.0, 1.0, 0.0);
-	centre = glm::dvec3(0.0, 0.0, RADIUS_EARTH_VIEW);
+	centre = glm::dvec3(0.0, 0.0, 0.0);
 
-	longitudeRotRad = 0;
-	latitudeRotRad = 0;
 
-	translation = glm::dvec3(0.0);
+	bool side = true;
+
+	if (side) {
+		// Side
+		longitudeRotRad = 1.62316;
+		latitudeRotRad = 0.0;
+		translation = glm::dvec3(2.47295, 6.70685, 5.38065);
+	}
+	else {
+		// Face
+		longitudeRotRad = -0.593408;
+		latitudeRotRad = 0.863938;
+		translation = glm::dvec3(2.9946, 7.7957, 3.83579);
+	}
+
+
 }

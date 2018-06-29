@@ -29,7 +29,7 @@ RenderEngine::RenderEngine(SDL_Window* window) : window(window), fade(true) {
 
 	glPointSize(30.f);
 	glLineWidth(1.5f);
-	glClearColor(0.4f, 0.4f, 0.4f, 1.f);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 }
 
 // Called to render the active object. RenderEngine stores all information about how to render

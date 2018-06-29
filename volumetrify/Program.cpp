@@ -27,6 +27,7 @@ Program::Program() {
 
 	curved = true;
 	volume = false;
+	fullSphere = false;
 	sl = 0;
 
 	width = height = 800;
@@ -78,8 +79,19 @@ void Program::updateRenderable() {
 
 	const auto& map = (volume) ? v.map : g.map;
 	for (auto p : map) {
-		if (p.first.length() != sl + 1 || p.first[0] != 'a') continue;
+		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
+		
+		//if (p.first[0] == 'a' && p.first[1] == '0') {
+		//	if (p.first.length() != sl + 1) continue;
+		//	
+		//else if (p.first == "a4") {
+		//	p.second.fillRenderable(grid, glm::vec3(0.6f, 0.6f, 0.6f), curved);
+		//}
+		//else {
+
+		//}
 		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
+		
 	}
 
 	grid.doubleToFloats();
@@ -130,16 +142,23 @@ void Program::mainLoop() {
 			InputHandler::pollEvent(e);
 		}
 
-		// Find min and max distance from camera to cell renderable - used for fading effect
-		glm::vec3 cameraPos = camera->getPosition();
-		float max = (float)(glm::length(cameraPos) + RADIUS_EARTH_VIEW);
-		float min = (float)(glm::length(cameraPos) - RADIUS_EARTH_VIEW);
-
 		glm::dmat4 worldModel(1.f);
 		double s = scale * (1.0 / RADIUS_EARTH_M) * RADIUS_EARTH_VIEW;
 		worldModel = glm::scale(worldModel, glm::dvec3(s, s, s));
 		worldModel = glm::rotate(worldModel, latRot, glm::dvec3(-1.0, 0.0, 0.0));
 		worldModel = glm::rotate(worldModel, longRot, glm::dvec3(0.0, 1.0, 0.0));
+
+		// Find min and max distance from camera to cell renderable - used for fading effect
+		glm::vec3 cameraPos = camera->getPosition();
+		float max = -1.f;
+		float min = 999999999.f;
+
+		for (const glm::vec3& vert : grid.verts) {
+			float l = glm::length((float)s * vert - cameraPos);
+			max = std::max(max, l);
+			min = std::min(min, l);
+		}
+		//std::cout << max << " : " << min << std::endl;
 
 		renderEngine->render(objects, (glm::dmat4)camera->getLookAt() * worldModel, max, min);
 		SDL_GL_SwapWindow(window);
@@ -220,6 +239,12 @@ void Program::toggleCurved() {
 
 void Program::toggleVolume() {
 	volume = !volume;
+	updateRenderable();
+}
+
+
+void Program::toggleFullSphere() {
+	fullSphere = !fullSphere;
 	updateRenderable();
 }
 
