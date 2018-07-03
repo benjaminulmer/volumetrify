@@ -33,6 +33,33 @@ void Cell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved)
 	Geometry::createLineR(v2.toCartesian(maxRad), v2.toCartesian(minRad), r);
 }
 
+void Cell::fourToOne(std::array<Cell, 4>& out) {
+
+	SphCoord mid01 = SphCoord((v0.toCartesian(1.0) + v1.toCartesian(1.0)) / 2.0);
+	SphCoord mid02 = SphCoord((v0.toCartesian(1.0) + v2.toCartesian(1.0)) / 2.0);
+	SphCoord mid12 = SphCoord((v1.toCartesian(1.0) + v2.toCartesian(1.0)) / 2.0);
+
+	out[0] = Cell();
+	out[0].v0 = v0;
+	out[0].v1 = mid01;
+	out[0].v2 = mid02;
+
+	out[1] = Cell();
+	out[1].v0 = v1;
+	out[1].v1 = mid01;
+	out[1].v2 = mid12;
+
+	out[2] = Cell();
+	out[2].v0 = v2;
+	out[2].v1 = mid02;
+	out[2].v2 = mid12;
+
+	out[3] = Cell();
+	out[3].v0 = mid01;
+	out[3].v1 = mid02;
+	out[3].v2 = mid12;
+}
+
 TestGrid::TestGrid() {
 
 	char num = 'a';
@@ -113,43 +140,25 @@ void TestGrid::subdivide(bool volume) {
 			}
 		}
 
-		SphCoord mid01 = SphCoord((c.v0.toCartesian(1.0) + c.v1.toCartesian(1.0)) / 2.0);
-		SphCoord mid02 = SphCoord((c.v0.toCartesian(1.0) + c.v2.toCartesian(1.0)) / 2.0);
-		SphCoord mid12 = SphCoord((c.v1.toCartesian(1.0) + c.v2.toCartesian(1.0)) / 2.0);
+		std::array<Cell, 4> children;
+		c.fourToOne(children);
 
-		Cell n1, n2, n3, n4;
-		n1.v0 = c.v0;
-		n1.v1 = mid01;
-		n1.v2 = mid02;
-
-		n2.v0 = c.v1;
-		n2.v1 = mid01;
-		n2.v2 = mid12;
-
-		n3.v0 = c.v2;
-		n3.v1 = mid02;
-		n3.v2 = mid12;
-
-		n4.v0 = mid01;
-		n4.v1 = mid02;
-		n4.v2 = mid12;
-
-		Cell top1 = n1;
+		Cell top1 = children[0];
 		top1.maxRad = c.maxRad;
 		top1.minRad = midRad;
 		top1.cellType = CT::NG;
 
-		Cell top2 = n2;
+		Cell top2 = children[1];
 		top2.maxRad = c.maxRad;
 		top2.minRad = midRad;
 		top2.cellType = CT::NG;
 
-		Cell top3 = n3;
+		Cell top3 = children[2];
 		top3.maxRad = c.maxRad;
 		top3.minRad = midRad;
 		top3.cellType = CT::NG;
 
-		Cell top4 = n4;
+		Cell top4 = children[3];
 		top4.maxRad = c.maxRad;
 		top4.minRad = midRad;
 		top4.cellType = CT::NG;
@@ -161,22 +170,22 @@ void TestGrid::subdivide(bool volume) {
 
 		if (c.cellType == CT::NG) {
 
-			Cell bot1 = n1;
+			Cell bot1 = children[0];
 			bot1.maxRad = midRad;
 			bot1.minRad = c.minRad;
 			bot1.cellType = CT::NG;
 
-			Cell bot2 = n2;
+			Cell bot2 = children[1];
 			bot2.maxRad = midRad;
 			bot2.minRad = c.minRad;
 			bot2.cellType = CT::NG;
 
-			Cell bot3 = n3;
+			Cell bot3 = children[2];
 			bot3.maxRad = midRad;
 			bot3.minRad = c.minRad;
 			bot3.cellType = CT::NG;
 
-			Cell bot4 = n4;
+			Cell bot4 = children[3];
 			bot4.maxRad = midRad;
 			bot4.minRad = c.minRad;
 			bot4.cellType = CT::NG;
