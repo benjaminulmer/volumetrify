@@ -14,24 +14,22 @@ enum class CT {
 	NG
 };
 
-class SphPolygon {
+struct Tri {
+	glm::dvec3 v0;
+	glm::dvec3 v1;
+	glm::dvec3 v2;
 
+	void fourToOne(std::array<Tri, 4>& out);
+	void nineToOne(std::array<Tri, 9>& out);
 };
 
-class Cell {
-
-public:
-	SphCoord v0;
-	SphCoord v1;
-	SphCoord v2;
-	double maxRad;
+struct TriCell {
+	Tri tri;
 	double minRad;
+	double maxRad;
 	CT cellType;
 
 	void fillRenderable(Renderable& r, const glm::vec3& colour, bool curved);
-
-	void fourToOne(std::array<Cell, 4>& out);
-	void nineToOne(std::array<Cell, 9>& out);
 };
 
 class TestGrid {
@@ -42,7 +40,7 @@ public:
 	void subdivide(bool volume);
 
 //private:
-	std::unordered_map<std::string, Cell> map;
+	std::unordered_map<std::string, TriCell> map;
 	int curDepth;
 };
 

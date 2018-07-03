@@ -25,7 +25,7 @@ Program::Program() {
 	longRot = 0;
 	latRot = 0;
 
-	curved = true;
+	curved = false;
 	volume = false;
 	fullSphere = false;
 	sl = 0;

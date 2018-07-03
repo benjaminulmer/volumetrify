@@ -3,58 +3,64 @@
 
 #include "Geometry.h"
 
-void Cell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved) {
+#define RAD 6371000.0 * (4.0 / 3.0)
+
+
+void TriCell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved) {
 
 	r.lineColour = colour;
 	glm::dvec3 o(0.0);
 
-	Geometry::createArcR(v0.toCartesian(maxRad), v1.toCartesian(maxRad), o, r);
-	Geometry::createArcR(v0.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
-	Geometry::createArcR(v1.toCartesian(maxRad), v2.toCartesian(maxRad), o, r);
+	if (curved) {
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v1) * RAD * maxRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
 
-	Geometry::createArcR(v0.toCartesian(minRad), v1.toCartesian(minRad), o, r);
-	Geometry::createArcR(v0.toCartesian(minRad), v2.toCartesian(minRad), o, r);
-	Geometry::createArcR(v1.toCartesian(minRad), v2.toCartesian(minRad), o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v1) * RAD * minRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v1) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
 
-	if (!curved) {
-		r.lineColour = glm::vec3(1.f, 0.f, 0.f);
-		Geometry::createLineR(v0.toCartesian(maxRad), v1.toCartesian(maxRad), r);
-		Geometry::createLineR(v0.toCartesian(maxRad), v2.toCartesian(maxRad), r);
-		Geometry::createLineR(v1.toCartesian(maxRad), v2.toCartesian(maxRad), r);
-
-		Geometry::createLineR(v0.toCartesian(minRad), v1.toCartesian(minRad), r);
-		Geometry::createLineR(v0.toCartesian(minRad), v2.toCartesian(minRad), r);
-		Geometry::createLineR(v1.toCartesian(minRad), v2.toCartesian(minRad), r);
-		r.lineColour = colour;
+		Geometry::createLineR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v0) * RAD * minRad, r);
+		Geometry::createLineR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v1) * RAD * minRad, r);
+		Geometry::createLineR(glm::normalize(tri.v2) * RAD * maxRad, glm::normalize(tri.v2) * RAD * minRad, r);
 	}
+	else {
+		Geometry::createLineR(tri.v0 * maxRad, tri.v1 * maxRad, r);
+		Geometry::createLineR(tri.v0 * maxRad, tri.v2 * maxRad, r);
+		Geometry::createLineR(tri.v1 * maxRad, tri.v2 * maxRad, r);
 
-	Geometry::createLineR(v0.toCartesian(maxRad), v0.toCartesian(minRad), r);
-	Geometry::createLineR(v1.toCartesian(maxRad), v1.toCartesian(minRad), r);
-	Geometry::createLineR(v2.toCartesian(maxRad), v2.toCartesian(minRad), r);
+		Geometry::createLineR(tri.v0 * minRad, tri.v1 * minRad, r);
+		Geometry::createLineR(tri.v0 * minRad, tri.v2 * minRad, r);
+		Geometry::createLineR(tri.v1 * minRad, tri.v2 * minRad, r);
+
+		Geometry::createLineR(tri.v0 * maxRad, tri.v0 * minRad, r);
+		Geometry::createLineR(tri.v1 * maxRad, tri.v1 * minRad, r);
+		Geometry::createLineR(tri.v2 * maxRad, tri.v2 * minRad, r);
+	}
 }
 
-void Cell::fourToOne(std::array<Cell, 4>& out) {
+void Tri::fourToOne(std::array<Tri, 4>& out) {
 
-	SphCoord mid01 = SphCoord((v0.toCartesian(1.0) + v1.toCartesian(1.0)) / 2.0);
-	SphCoord mid02 = SphCoord((v0.toCartesian(1.0) + v2.toCartesian(1.0)) / 2.0);
-	SphCoord mid12 = SphCoord((v1.toCartesian(1.0) + v2.toCartesian(1.0)) / 2.0);
+	glm::dvec3 mid01 = 0.5 * v0 + 0.5 * v1;
+	glm::dvec3 mid02 = 0.5 * v0 + 0.5 * v2;
+	glm::dvec3 mid12 = 0.5 * v1 + 0.5 * v2;
 
-	out[0] = Cell();
+	out[0] = Tri();
 	out[0].v0 = v0;
 	out[0].v1 = mid01;
 	out[0].v2 = mid02;
 
-	out[1] = Cell();
+	out[1] = Tri();
 	out[1].v0 = v1;
 	out[1].v1 = mid01;
 	out[1].v2 = mid12;
 
-	out[2] = Cell();
+	out[2] = Tri();
 	out[2].v0 = v2;
 	out[2].v1 = mid02;
 	out[2].v2 = mid12;
 
-	out[3] = Cell();
+	out[3] = Tri();
 	out[3].v0 = mid01;
 	out[3].v1 = mid02;
 	out[3].v2 = mid12;
@@ -63,25 +69,36 @@ void Cell::fourToOne(std::array<Cell, 4>& out) {
 TestGrid::TestGrid() {
 
 	char num = 'a';
+	SphCoord v0, v1, v2;
 
 	// Top
 	for (int i = 0; i < 5; i++) {
 
 		std::string code1 = std::string(1, num++);
-		Cell c1;
-		c1.v0 = SphCoord(M_PI_2, 0.0);
-		c1.v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
-		c1.v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
-		c1.maxRad = 6371000.0 * (4.0 / 3.0);
+		v0 = SphCoord(M_PI_2, 0.0);
+		v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
+		v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
+
+		TriCell c1;
+		c1.tri.v0 = v0.toCartesian(RAD);
+		c1.tri.v1 = v1.toCartesian(RAD);
+		c1.tri.v2 = v2.toCartesian(RAD);
+
+		c1.maxRad = 1.0;
 		c1.minRad = 0.0;
 		c1.cellType = CT::SG;
 
 		std::string code2 = std::string(1, num++);
-		Cell c2;
-		c2.v0 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		c2.v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
-		c2.v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
-		c2.maxRad = 6371000.0 * (4.0 / 3.0);
+		v0 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+		v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
+		v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
+
+		TriCell c2;
+		c2.tri.v0 = v0.toCartesian(RAD);
+		c2.tri.v1 = v1.toCartesian(RAD);
+		c2.tri.v2 = v2.toCartesian(RAD);
+
+		c2.maxRad = 1.0;
 		c2.minRad = 0.0;
 		c2.cellType = CT::SG;
 
@@ -93,20 +110,30 @@ TestGrid::TestGrid() {
 	for (int i = 0; i < 5; i++) {
 
 		std::string code1 = std::string(1, num++);
-		Cell c1;
-		c1.v0 = SphCoord(-M_PI_2, 0.0);
-		c1.v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		c1.v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		c1.maxRad = 6371000.0 * (4.0 / 3.0);
+		v0 = SphCoord(-M_PI_2, 0.0);
+		v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+		v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+
+		TriCell c1;
+		c1.tri.v0 = v0.toCartesian(RAD);
+		c1.tri.v1 = v1.toCartesian(RAD);
+		c1.tri.v2 = v2.toCartesian(RAD);
+
+		c1.maxRad = 1.0;
 		c1.minRad = 0.0;
 		c1.cellType = CT::SG;
 
 		std::string code2 = std::string(1, num++);
-		Cell c2;
-		c2.v0 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
-		c2.v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		c2.v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		c2.maxRad = 6371000.0 * (4.0 / 3.0);
+		v0 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
+		v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+		v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+
+		TriCell c2;
+		c2.tri.v0 = v0.toCartesian(RAD);
+		c2.tri.v1 = v1.toCartesian(RAD);
+		c2.tri.v2 = v2.toCartesian(RAD);
+
+		c2.maxRad = 1.0;
 		c2.minRad = 0.0;
 		c2.cellType = CT::SG;
 
@@ -122,7 +149,7 @@ void TestGrid::subdivide(bool volume) {
 	for (auto p : map) {
 		if (p.first.length() != curDepth) continue;
 
-		Cell& c = p.second;
+		TriCell& c = p.second;
 
 		double midRad;
 		if (c.cellType == CT::SG) {
@@ -140,25 +167,29 @@ void TestGrid::subdivide(bool volume) {
 			}
 		}
 
-		std::array<Cell, 4> children;
-		c.fourToOne(children);
+		std::array<Tri, 4> children;
+		c.tri.fourToOne(children);
 
-		Cell top1 = children[0];
+		TriCell top1;
+		top1.tri = children[0];
 		top1.maxRad = c.maxRad;
 		top1.minRad = midRad;
 		top1.cellType = CT::NG;
 
-		Cell top2 = children[1];
+		TriCell top2;
+		top2.tri = children[1];
 		top2.maxRad = c.maxRad;
 		top2.minRad = midRad;
 		top2.cellType = CT::NG;
 
-		Cell top3 = children[2];
+		TriCell top3;
+		top3.tri = children[2];
 		top3.maxRad = c.maxRad;
 		top3.minRad = midRad;
 		top3.cellType = CT::NG;
 
-		Cell top4 = children[3];
+		TriCell top4;
+		top4.tri = children[3];
 		top4.maxRad = c.maxRad;
 		top4.minRad = midRad;
 		top4.cellType = CT::NG;
@@ -170,22 +201,26 @@ void TestGrid::subdivide(bool volume) {
 
 		if (c.cellType == CT::NG) {
 
-			Cell bot1 = children[0];
+			TriCell bot1;
+			bot1.tri = children[0];
 			bot1.maxRad = midRad;
 			bot1.minRad = c.minRad;
 			bot1.cellType = CT::NG;
 
-			Cell bot2 = children[1];
+			TriCell bot2;
+			bot2.tri = children[1];
 			bot2.maxRad = midRad;
 			bot2.minRad = c.minRad;
 			bot2.cellType = CT::NG;
 
-			Cell bot3 = children[2];
+			TriCell bot3;
+			bot3.tri = children[2];
 			bot3.maxRad = midRad;
 			bot3.minRad = c.minRad;
 			bot3.cellType = CT::NG;
 
-			Cell bot4 = children[3];
+			TriCell bot4;
+			bot4.tri = children[3];
 			bot4.maxRad = midRad;
 			bot4.minRad = c.minRad;
 			bot4.cellType = CT::NG;
@@ -196,7 +231,7 @@ void TestGrid::subdivide(bool volume) {
 			map[p.first + "7"] = bot4;
 		}
 		else {
-			Cell bottom = c;
+			TriCell bottom = c;
 			bottom.maxRad = midRad;
 			bottom.cellType = CT::SG;
 
