@@ -15,6 +15,9 @@ enum class CT {
 };
 
 struct Tri {
+	Tri() = default;
+	Tri(int n);
+
 	glm::dvec3 v0;
 	glm::dvec3 v1;
 	glm::dvec3 v2;

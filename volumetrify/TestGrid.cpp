@@ -4,9 +4,50 @@
 #include "Geometry.h"
 
 #define RAD 6371000.0 * (4.0 / 3.0)
+#include <iostream>
+Tri::Tri(int n) {
+
+	double target = 4 * M_PI / n;
+	double actual = 2 * M_PI;
+
+	v0 = SphCoord(0.0, 0.0, false).toCartesian(1.0);
+	v1 = SphCoord(0.0, 120.0, false).toCartesian(1.0);
+	v2 = SphCoord(0.0, -120.0, false).toCartesian(1.0);
+	glm::dvec3 p = SphCoord(90.0, 0.0, false).toCartesian(1.0);
+
+	if (n <= 2) return;
+
+	double upper = 1.0;
+	double lower = 0.0;
+
+	glm::dvec3 tV0, tV1, tV2;
+	while (abs(target - actual) > 0.0001) {
+
+		double t = 0.5 * upper + 0.5 * lower;
+		tV0 = Geometry::geomSlerp(v0, p, t);
+		tV1 = Geometry::geomSlerp(v1, p, t);
+		tV2 = Geometry::geomSlerp(v2, p, t);
+
+		std::vector<SphCoord> poly;
+		poly.push_back(SphCoord(tV0));
+		poly.push_back(SphCoord(tV1));
+		poly.push_back(SphCoord(tV2));
+		actual = SphCoord::areaPolygon(poly, 1.0);
+
+		if (actual > target) {
+			lower = t;
+		}
+		else {
+			upper = t;
+		}
+	}
+	v0 = tV0 * RAD;
+	v1 = tV1 * RAD;
+	v2 = tV2 * RAD;
+}
 
 
-void TriCell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curved) {
+void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curved) {
 
 	r.lineColour = colour;
 	glm::dvec3 o(0.0);
@@ -39,6 +80,7 @@ void TriCell::fillRenderable(Renderable & r, const glm::vec3 & colour, bool curv
 	}
 }
 
+
 void Tri::fourToOne(std::array<Tri, 4>& out) {
 
 	glm::dvec3 mid01 = 0.5 * v0 + 0.5 * v1;
@@ -66,81 +108,76 @@ void Tri::fourToOne(std::array<Tri, 4>& out) {
 	out[3].v2 = mid12;
 }
 
+
 TestGrid::TestGrid() {
 
-	char num = 'a';
-	SphCoord v0, v1, v2;
+	std::string code = "a";
+	Tri t(3000);
+	TriCell cell;
+	cell.tri = t;
+	cell.maxRad = 1.0;
+	cell.minRad = 0.0;
+	cell.cellType = CT::SG;
 
-	// Top
-	for (int i = 0; i < 5; i++) {
+	map[code] = cell;
 
-		std::string code1 = std::string(1, num++);
-		v0 = SphCoord(M_PI_2, 0.0);
-		v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
-		v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
 
-		TriCell c1;
-		c1.tri.v0 = v0.toCartesian(RAD);
-		c1.tri.v1 = v1.toCartesian(RAD);
-		c1.tri.v2 = v2.toCartesian(RAD);
+	//char num = 'a';
 
-		c1.maxRad = 1.0;
-		c1.minRad = 0.0;
-		c1.cellType = CT::SG;
+	//// Top
+	//for (int i = 0; i < 5; i++) {
 
-		std::string code2 = std::string(1, num++);
-		v0 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0));
-		v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
+	//	std::string code1 = std::string(1, num++);
+	//	TriCell c1;
+	//	c1.tri.v0 = SphCoord(M_PI_2, 0.0).toCartesian(RAD);
+	//	c1.tri.v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0)).toCartesian(RAD);
+	//	c1.tri.v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0)).toCartesian(RAD);
 
-		TriCell c2;
-		c2.tri.v0 = v0.toCartesian(RAD);
-		c2.tri.v1 = v1.toCartesian(RAD);
-		c2.tri.v2 = v2.toCartesian(RAD);
+	//	c1.maxRad = 1.0;
+	//	c1.minRad = 0.0;
+	//	c1.cellType = CT::SG;
 
-		c2.maxRad = 1.0;
-		c2.minRad = 0.0;
-		c2.cellType = CT::SG;
+	//	std::string code2 = std::string(1, num++);
+	//	TriCell c2;
+	//	c2.tri.v0 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0)).toCartesian(RAD);
+	//	c2.tri.v1 = SphCoord(atan(0.5), i * (2.0 * M_PI / 5.0)).toCartesian(RAD);
+	//	c2.tri.v2 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0)).toCartesian(RAD);
 
-		map[code1] = c1;
-		map[code2] = c2;
-	}
+	//	c2.maxRad = 1.0;
+	//	c2.minRad = 0.0;
+	//	c2.cellType = CT::SG;
 
-	// Bottom
-	for (int i = 0; i < 5; i++) {
+	//	map[code1] = c1;
+	//	map[code2] = c2;
+	//}
 
-		std::string code1 = std::string(1, num++);
-		v0 = SphCoord(-M_PI_2, 0.0);
-		v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+	//// Bottom
+	//for (int i = 0; i < 5; i++) {
 
-		TriCell c1;
-		c1.tri.v0 = v0.toCartesian(RAD);
-		c1.tri.v1 = v1.toCartesian(RAD);
-		c1.tri.v2 = v2.toCartesian(RAD);
+	//	std::string code1 = std::string(1, num++);
+	//	TriCell c1;
+	//	c1.tri.v0 = SphCoord(-M_PI_2, 0.0).toCartesian(RAD);
+	//	c1.tri.v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0)).toCartesian(RAD);
+	//	c1.tri.v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0)).toCartesian(RAD);
 
-		c1.maxRad = 1.0;
-		c1.minRad = 0.0;
-		c1.cellType = CT::SG;
+	//	c1.maxRad = 1.0;
+	//	c1.minRad = 0.0;
+	//	c1.cellType = CT::SG;
 
-		std::string code2 = std::string(1, num++);
-		v0 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0));
-		v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
-		v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0));
+	//	std::string code2 = std::string(1, num++);
+	//	TriCell c2;
+	//	c2.tri.v0 = SphCoord(atan(0.5), (i + 1) * (2.0 * M_PI / 5.0)).toCartesian(RAD);
+	//	c2.tri.v1 = SphCoord(-atan(0.5), i * (2.0 * M_PI / 5.0) + (M_PI / 5.0)).toCartesian(RAD);
+	//	c2.tri.v2 = SphCoord(-atan(0.5), (i + 1) * (2.0 * M_PI / 5.0) + (M_PI / 5.0)).toCartesian(RAD);
 
-		TriCell c2;
-		c2.tri.v0 = v0.toCartesian(RAD);
-		c2.tri.v1 = v1.toCartesian(RAD);
-		c2.tri.v2 = v2.toCartesian(RAD);
+	//	c2.maxRad = 1.0;
+	//	c2.minRad = 0.0;
+	//	c2.cellType = CT::SG;
 
-		c2.maxRad = 1.0;
-		c2.minRad = 0.0;
-		c2.cellType = CT::SG;
-
-		map[code1] = c1;
-		map[code2] = c2;
-	}
-	curDepth = 1;
+	//	map[code1] = c1;
+	//	map[code2] = c2;
+	//}
+	//curDepth = 1;
 }
 
 

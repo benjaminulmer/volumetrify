@@ -11,7 +11,6 @@ Camera::Camera() : zoomScale(1.3), rotScale(0.008) {
 	reset();
 }
 
-#include <iostream>
 // Returns view matrix for the camera
 glm::dmat4 Camera::getLookAt() const {
 
@@ -128,6 +127,7 @@ void Camera::reset() {
 		latitudeRotRad = 0.863938;
 		translation = glm::dvec3(2.9946, 7.7957, 3.83579);
 	}
-
-
+	longitudeRotRad = 0.0;
+	latitudeRotRad = 0.0;
+	translation = glm::dvec3(0.0);
 }
