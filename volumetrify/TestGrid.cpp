@@ -112,7 +112,7 @@ void Tri::fourToOne(std::array<Tri, 4>& out) {
 TestGrid::TestGrid() {
 
 	std::string code = "a";
-	Tri t(3000);
+	Tri t(2000);
 	TriCell cell;
 	cell.tri = t;
 	cell.maxRad = 1.0;
@@ -120,7 +120,7 @@ TestGrid::TestGrid() {
 	cell.cellType = CT::SG;
 
 	map[code] = cell;
-
+	curDepth = 1;
 
 	//char num = 'a';
 
@@ -268,6 +268,159 @@ void TestGrid::subdivide(bool volume) {
 			map[p.first + "7"] = bot4;
 		}
 		else {
+			TriCell bottom = c;
+			bottom.maxRad = midRad;
+			bottom.cellType = CT::SG;
+
+			map[p.first + "4"] = bottom;
+		}
+	}
+	curDepth++;
+}
+
+
+void TestGrid::subdivide2(bool volume) {
+
+	for (auto p : map) {
+
+		char num = 'a';
+
+		if (p.first.length() != curDepth) continue;
+
+		TriCell& c = p.second;
+
+		std::array<Tri, 4> children;
+		c.tri.fourToOne(children);
+
+		double midRad = 0.5 * c.maxRad + 0.5 * c.minRad;
+
+		double numLayers = (c.cellType == CT::SG) ? 13.0 : 2.0;
+		double lowerRad = (c.cellType == CT::SG) ? midRad : c.minRad;
+
+		for (double i = 0.0; i < numLayers; i++) {
+
+			double u1 = (numLayers - i) / numLayers;
+			double l1 = i / numLayers;
+
+			double u2 = (numLayers - i - 1) / numLayers;
+			double l2 = (i + 1) / numLayers;
+
+			double maxRad = u1 * c.maxRad + l1 * lowerRad;
+			double minRad = u2 * c.maxRad + l2 * lowerRad;
+
+			TriCell top1;
+			top1.tri = children[0];
+			top1.maxRad = maxRad;
+			top1.minRad = minRad;
+			top1.cellType = CT::NG;
+
+			TriCell top2;
+			top2.tri = children[1];
+			top2.maxRad = maxRad;
+			top2.minRad = minRad;
+			top2.cellType = CT::NG;
+
+			TriCell top3;
+			top3.tri = children[2];
+			top3.maxRad = maxRad;
+			top3.minRad = minRad;
+			top3.cellType = CT::NG;
+
+			TriCell top4;
+			top4.tri = children[3];
+			top4.maxRad = maxRad;
+			top4.minRad = minRad;
+			top4.cellType = CT::NG;
+
+			map[p.first + std::string(1, num++)] = top1;
+			map[p.first + std::string(1, num++)] = top2;
+			map[p.first + std::string(1, num++)] = top3;
+			map[p.first + std::string(1, num++)] = top4;
+		}
+
+		if (c.cellType == CT::SG) {
+			TriCell bottom = c;
+			bottom.maxRad = midRad;
+			bottom.cellType = CT::SG;
+
+			map[p.first + "4"] = bottom;
+		}
+	}
+	curDepth++;
+}
+
+
+void TestGrid::subdivide3(bool volume) {
+
+	for (auto p : map) {
+
+		char num = 'a';
+
+		if (p.first.length() != curDepth) continue;
+
+		TriCell& c = p.second;
+
+		std::array<Tri, 4> children;
+		c.tri.fourToOne(children);
+
+		double midRad = 0.5 * c.maxRad + 0.5 * c.minRad;
+
+		double numLayers = (c.cellType == CT::SG) ? 6.0 : 2.0;
+		double lowerRad = (c.cellType == CT::SG) ? midRad : c.minRad;
+
+		for (double i = 0.0; i < numLayers; i++) {
+
+			double u1 = (numLayers - i) / numLayers;
+			double l1 = i / numLayers;
+
+			double u2 = (numLayers - i - 1) / numLayers;
+			double l2 = (i + 1) / numLayers;
+
+			double maxRad = u1 * c.maxRad + l1 * lowerRad;
+			double minRad = u2 * c.maxRad + l2 * lowerRad;
+
+			if (c.cellType == CT::NG) {
+
+				TriCell top1;
+				top1.tri = children[0];
+				top1.maxRad = maxRad;
+				top1.minRad = minRad;
+				top1.cellType = CT::NG;
+
+				TriCell top2;
+				top2.tri = children[1];
+				top2.maxRad = maxRad;
+				top2.minRad = minRad;
+				top2.cellType = CT::NG;
+
+				TriCell top3;
+				top3.tri = children[2];
+				top3.maxRad = maxRad;
+				top3.minRad = minRad;
+				top3.cellType = CT::NG;
+
+				TriCell top4;
+				top4.tri = children[3];
+				top4.maxRad = maxRad;
+				top4.minRad = minRad;
+				top4.cellType = CT::NG;
+
+				map[p.first + std::string(1, num++)] = top1;
+				map[p.first + std::string(1, num++)] = top2;
+				map[p.first + std::string(1, num++)] = top3;
+				map[p.first + std::string(1, num++)] = top4;
+			}
+			else {
+				TriCell top1 = c;
+				top1.maxRad = maxRad;
+				top1.minRad = minRad;
+				top1.cellType = CT::NG;
+
+				map[p.first + std::string(1, num++)] = top1;
+			}
+		}
+
+		if (c.cellType == CT::SG) {
 			TriCell bottom = c;
 			bottom.maxRad = midRad;
 			bottom.cellType = CT::SG;

@@ -41,6 +41,8 @@ public:
 	TestGrid();
 
 	void subdivide(bool volume);
+	void subdivide2(bool volume);
+	void subdivide3(bool volume);
 
 //private:
 	std::unordered_map<std::string, TriCell> map;
