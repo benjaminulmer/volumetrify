@@ -64,8 +64,8 @@ void Program::start() {
 
 	// Subdivide grid and create renderable
 	for (int i = 0; i < maxSL; i++) {
-		g.subdivide2(false);
-		v.subdivide3(true);
+		g.subdivide(false);
+		v.subdivide(true);
 	}
 	updateRenderable();
 

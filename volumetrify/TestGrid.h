@@ -22,8 +22,8 @@ struct Tri {
 	glm::dvec3 v1;
 	glm::dvec3 v2;
 
-	void fourToOne(std::array<Tri, 4>& out);
-	void nineToOne(std::array<Tri, 9>& out);
+	std::array<Tri, 4> fourToOne() const;
+	std::array<Tri, 9> nineToOne() const;
 };
 
 struct TriCell {
@@ -31,8 +31,10 @@ struct TriCell {
 	double minRad;
 	double maxRad;
 	CT cellType;
+	std::string code;
 
-	void fillRenderable(Renderable& r, const glm::vec3& colour, bool curved);
+	std::vector<TriCell> subdivide() const;
+	void fillRenderable(Renderable& r, const glm::vec3& colour, bool curved) const;
 };
 
 class TestGrid {
