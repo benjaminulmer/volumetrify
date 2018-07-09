@@ -89,7 +89,7 @@ std::array<Tri, 4> Tri::fourToOne() const {
 
 // Subdivide TriCell into its children. Properly adapts to size of triangle
 // Currently assumes 1-4 surface subdivision scheme.
-std::vector<TriCell> TriCell::subdivide() const {
+std::vector<TriCell> TriCell::subdivide(bool volume) const {
 
 	std::vector<TriCell> toReturn;
 	std::array<Tri, 4> children = tri.fourToOne();
@@ -102,17 +102,26 @@ std::vector<TriCell> TriCell::subdivide() const {
 		// Split all surface children once along radial direction
 		for (const Tri& t : children) {
 
+			// Splitting point changes if we want equal volume
+			double radSplit;
+			if (volume) {
+				radSplit = pow((pow(maxRad, 3) + pow(minRad, 3)) / 2.0, 1.0 / 3.0);
+			}
+			else {
+				radSplit = midRad;
+			}
+
 			TriCell top;
 			top.tri = t;
 			top.maxRad = maxRad;
-			top.minRad = midRad;
+			top.minRad = radSplit;
 			top.cellType = CT::NG;
 			top.code = code + std::string(1, num++);
 			toReturn.push_back(top);
 
 			TriCell bottom;
 			bottom.tri = t;
-			bottom.maxRad = midRad;
+			bottom.maxRad = radSplit;
 			bottom.minRad = minRad;
 			bottom.cellType = CT::NG;
 			bottom.code = code + std::string(1, num++);
@@ -137,17 +146,31 @@ std::vector<TriCell> TriCell::subdivide() const {
 		if (numLayers > 0.75) {
 
 			// Round number of layers to nearest integer
+			double prevLower = maxRad;
 			double numLayersR = (int)(numLayers + 0.5);
 			for (int i = 0; i < numLayersR; i++) {
 
-				double u1 = (numLayersR - i) / numLayersR;
-				double l1 = i / numLayersR;
+				// Splitting point changes if we want equal volume
+				double upperRad, lowerRad;
+				if (volume) {
 
-				double u2 = (numLayersR - i - 1) / numLayersR;
-				double l2 = (i + 1) / numLayersR;
+					int n = numLayersR - i - 1;
+					upperRad = prevLower;
+					// Equal cell volume formula
+					lowerRad = (n == 0.0) ? midRad : pow((n * pow(prevLower, 3) + pow(midRad, 3)) / (1 + n), 1.0 / 3.0);
+					prevLower = lowerRad;
+				}
+				else {
 
-				double upperRad = u1 * maxRad + l1 * midRad;
-				double lowerRad = u2 * maxRad + l2 * midRad;
+					double u1 = (numLayersR - i) / numLayersR;
+					double l1 = i / numLayersR;
+
+					double u2 = (numLayersR - i - 1) / numLayersR;
+					double l2 = (i + 1) / numLayersR;
+
+					upperRad = u1 * maxRad + l1 * midRad;
+					lowerRad = u2 * maxRad + l2 * midRad;
+				}
 
 				TriCell cell = *this;
 				cell.maxRad = upperRad;
@@ -297,7 +320,7 @@ void TestGrid::subdivide(bool volume) {
 
 		if (p.first.length() != curDepth) continue;
 
-		std::vector<TriCell> children = p.second.subdivide();
+		std::vector<TriCell> children = p.second.subdivide(volume);
 		for (const TriCell& c : children) {
 			map[c.code] = c;
 		}

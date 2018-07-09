@@ -33,7 +33,7 @@ struct TriCell {
 	CT cellType;
 	std::string code;
 
-	std::vector<TriCell> subdivide() const;
+	std::vector<TriCell> subdivide(bool volume) const;
 	void fillRenderable(Renderable& r, const glm::vec3& colour, bool curved) const;
 };
 

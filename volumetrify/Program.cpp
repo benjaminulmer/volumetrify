@@ -82,7 +82,6 @@ void Program::updateRenderable() {
 		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
 
 		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
-		
 	}
 
 	grid.doubleToFloats();
