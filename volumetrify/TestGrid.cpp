@@ -91,6 +91,8 @@ std::array<Tri, 4> Tri::fourToOne() const {
 // Currently assumes 1-4 surface subdivision scheme.
 std::vector<TriCell> TriCell::subdivide(bool volume) const {
 
+	double ratio = 12.0;
+
 	std::vector<TriCell> toReturn;
 	std::array<Tri, 4> children = tri.fourToOne();
 	char num = 'a';
@@ -140,7 +142,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 
 		// Find number of layers to split upper region into to satisfy:
 		// sqrt(sa) == depth of cell
-		double numLayers = 1.0 / (2.0 * sqrt(sa));
+		double numLayers = ratio / (2.0 * sqrt(sa));
 
 		// Upper region is too long and skinny: split upper region into one or more layers
 		if (numLayers > 0.75) {
@@ -243,7 +245,7 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 // Dummy constructor for testing
 TestGrid::TestGrid() {
 
-	Tri t(6000);
+	Tri t(20);
 	TriCell cell;
 	cell.tri = t;
 	cell.maxRad = 1.0;

@@ -76,12 +76,22 @@ void Program::start() {
 void Program::updateRenderable() {
 
 	grid.clear();
+	system("cls");
 
 	const auto& map = (volume) ? v.map : g.map;
 	for (auto p : map) {
 		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
 
 		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
+
+		if (p.second.minRad > pow(0.5, sl)) {
+
+			std::vector<SphCoord> points;
+			points.push_back(p.second.tri.v0);
+			points.push_back(p.second.tri.v1);
+			points.push_back(p.second.tri.v2);
+			std::cout << SphCoord::volumeCell(points, p.second.maxRad, p.second.minRad) << std::endl;
+		}
 	}
 
 	grid.doubleToFloats();
