@@ -37,6 +37,23 @@ Program::Program() {
 // Called to start the program. Conducts set up then enters the main loop
 void Program::start() {	
 
+	std::cout << "Lyr\tDp\tBnd\tSG\tSGC\tEnd" << std::endl << "--------------------------------------------" << std::endl;
+	int n = 2;
+	for (int j = 0; j <= 36  ; j++) {
+
+		LayerInfo i = TestGrid::layerInfo(j, n);
+		std::cout << j << ":\t"<< i.depth << "\t" << i.boundary << "\t" << i.SG << "\t" << i.SG_Child << "\t" << i.end << std::endl;
+		//std::cout << j << "\t" << TestGrid::parentLayer(j, n, i) << std::endl;
+		//std::vector<int> ch = TestGrid::childrenLayers(j, n, i);
+		//std::cout << j << ":\t";
+		//for (int c : ch) {
+		//	std::cout << c << ", ";
+		//}
+		//std::cout << std::endl;
+	}
+	system("pause");
+
+
 	setupWindow();
 	GLenum err = glewInit();
 	if (glewInit() != GLEW_OK) {

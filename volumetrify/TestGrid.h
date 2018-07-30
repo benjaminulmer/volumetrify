@@ -9,6 +9,14 @@
 #include <string>
 #include <unordered_map>
 
+struct LayerInfo {
+	int depth;
+	int boundary;
+	bool SG;
+	bool SG_Child;
+	bool end;
+};
+
 enum class CT {
 	SG,
 	NG
@@ -43,8 +51,10 @@ public:
 	TestGrid();
 
 	void subdivide(bool volume);
-	void subdivide2(bool volume);
-	void subdivide3(bool volume);
+
+	static LayerInfo layerInfo(int layer, int n);
+	static int parentLayer(int layer, int n, const LayerInfo& info);
+	static std::vector<int> childrenLayers(int layer, int n, const LayerInfo& info);
 
 //private:
 	std::unordered_map<std::string, TriCell> map;
