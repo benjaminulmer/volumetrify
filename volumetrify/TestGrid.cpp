@@ -245,7 +245,7 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 // Dummy constructor for testing
 TestGrid::TestGrid() {
 
-	Tri t(4000);
+	Tri t(350);
 	TriCell cell;
 	cell.tri = t;
 	cell.maxRad = 1.0;
@@ -338,103 +338,3 @@ enum {
 };
 
 
-// Calculates information about the provided layer for a given n
-// Determines depth, boundary case, SG, child of SG, and end layer
-LayerInfo TestGrid::layerInfo(int layer, int n) {
-
-	LayerInfo info;
-
-	// Determine depth and if layer is an SG layer or end layer
-	info.depth = 0;
-	info.end = false;
-	info.SG = (layer == 0) ? true : false;
-
-	// Loop to determine depth and check for SG layer and end layer
-	int end = 0;
-	while (layer > end) {
-
-		if (layer == end + 1) {
-			info.SG = true;
-		}
-
-		end = 2 * end + n * info.depth + n + 2;
-		info.depth++;
-
-		if (layer == end) {
-			info.end = true;
-		}
-	}
-
-	// Determine if layer is child of an SG layer and if it is a boundary layer
-	info.boundary = NONE;
-	info.SG_Child = (info.depth == 1) ? true : false;
-
-	// Loop to check boundary cases and check for child of SG layer
-	int inc = (1 + n) * pow(2, info.depth - 1);
-	int top = end;
-	int i = 0;
-	while (layer <= top + 1) {
-
-		top -= inc;
-
-		// Condition for being child of SG layer
-		if (i == info.depth - 2 && layer <= top) {
-			info.SG_Child = true;
-		}
-
-		// Test for the two different boundary cases
-		if (layer == top) {
-			info.boundary = BELOW;
-			break;
-		}
-		else if (layer == top + 1) {
-			info.boundary = ABOVE;
-			break;
-		}
-		inc /= 2;
-		i++;
-	}
-
-	return info;
-}
-
-
-// Returns the layer parent to the given layer for a provided n
-// Requires layer info to be provided
-int TestGrid::parentLayer(int layer, int n, const LayerInfo & info) {
-
-	if (layer == 0) {
-		return -1;
-	}
-
-	if (info.SG_Child) {
-		int parent = 0;
-		for (int i = 0; i < info.depth - 1; i++) {
-			parent = 2 * parent + n * i + 1;
-		}
-		return parent;
-	}
-	else {
-		return (layer - n - (info.depth - 1) * n - 1) / 2;
-	}
-}
-
-
-// Returns the layers children to the given layer for a provided n
-// Requires layer info to be provided
-std::vector<int> TestGrid::childrenLayers(int layer, int n, const LayerInfo& info) {
-
-	std::vector<int> children;
-	
-	if (info.SG) {
-		for (int i = 1; i <= n + 2; i++) {
-			children.push_back(layer * 2 + (info.depth) * n + i);
-		}
-	}
-	else {
-		children.push_back(layer * 2 + (info.depth) * n + n + 1);
-		children.push_back(layer * 2 + (info.depth) * n + n + 2);
-	}
-
-	return children;
-}

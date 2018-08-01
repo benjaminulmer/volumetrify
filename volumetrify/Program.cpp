@@ -37,20 +37,27 @@ Program::Program() {
 // Called to start the program. Conducts set up then enters the main loop
 void Program::start() {	
 
-	std::cout << "Lyr\tDp\tBnd\tSG\tSGC\tEnd" << std::endl << "--------------------------------------------" << std::endl;
-	int n = 2;
-	for (int j = 0; j <= 36  ; j++) {
+	DGGS_3D dg(false, 350, 1.0, 100.0);
+	//std::cout.precision(17);
 
-		LayerInfo i = TestGrid::layerInfo(j, n);
-		std::cout << j << ":\t"<< i.depth << "\t" << i.boundary << "\t" << i.SG << "\t" << i.SG_Child << "\t" << i.end << std::endl;
-		//std::cout << j << "\t" << TestGrid::parentLayer(j, n, i) << std::endl;
-		//std::vector<int> ch = TestGrid::childrenLayers(j, n, i);
-		//std::cout << j << ":\t";
-		//for (int c : ch) {
-		//	std::cout << c << ", ";
-		//}
-		//std::cout << std::endl;
+
+	for (double num = 0.0; num <= 100.0; num += 5.0) {
+
+		int index = dg.layer(num, 3);
+
+		double other = (index == 0) ? 0.0 : dg.layerBounds[index - 1];
+
+		std::cout << index << ":  " << other << " < " << num << " <= " << dg.layerBounds[index] <<  "\t:\t" << ((other < num) && (num <= dg.layerBounds[index])) << std::endl;
+
 	}
+
+	//std::cout << "Lyr\tDp\tBnd\tSG\tSGC\tEnd" << std::endl << "--------------------------------------------" << std::endl;
+	//int n = 2;
+	//for (int j = 0; j <= 36  ; j++) {
+
+	//	LayerInfo i = dg.layerInfo(j);
+	//	std::cout << j << ":\t"<< i.depth << "\t" << i.boundary << "\t" << i.degen << "\t" << i.degenChild << "\t" << i.end << std::endl;
+	//}
 	system("pause");
 
 
@@ -93,7 +100,7 @@ void Program::start() {
 void Program::updateRenderable() {
 
 	grid.clear();
-	system("cls");
+	//system("cls");
 
 	const auto& map = (volume) ? v.map : g.map;
 	for (auto p : map) {
@@ -107,7 +114,7 @@ void Program::updateRenderable() {
 			points.push_back(p.second.tri.v0);
 			points.push_back(p.second.tri.v1);
 			points.push_back(p.second.tri.v2);
-			std::cout << SphCoord::volumeCell(points, p.second.maxRad, p.second.minRad) << std::endl;
+			//std::cout << SphCoord::volumeCell(points, p.second.maxRad, p.second.minRad) << std::endl;
 		}
 	}
 

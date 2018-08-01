@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "RenderEngine.h"
 #include "TestGrid.h"
+#include "DGGS_3D.h"
 
 enum class RadialBound {
 	MAX,
