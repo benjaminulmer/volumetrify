@@ -245,7 +245,7 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 // Dummy constructor for testing
 TestGrid::TestGrid() {
 
-	Tri t(350);
+	Tri t(18);
 	TriCell cell;
 	cell.tri = t;
 	cell.maxRad = 1.0;

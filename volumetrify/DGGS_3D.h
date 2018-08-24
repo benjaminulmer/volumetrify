@@ -4,7 +4,7 @@
 
 struct LayerInfo {
 	int depth;
-	int boundary;
+	int boundary; // might not be needed, already know surface SL for each layer
 	bool degen;
 	bool degenChild;
 	bool end;
@@ -20,21 +20,23 @@ public:
 	LayerInfo layerInfo(int layer);
 	int parentLayer(int layer, const LayerInfo& info);
 	std::vector<int> childrenLayers(int layer, const LayerInfo& info);
+	std::pair<int, int> neighbourLayers(int layer, const LayerInfo& info);
 
-//private:
+private:
 	bool volume;
 
 	int numInitialFaces;
 	double surfaceRadialRatio;
 	double gridRadius;
 
-	double idealNumDegenLayers;
-	int numDegenLayers;
-	int numExtraLayers;
+	double idealDegenChildren;
+	int degenChildren;
+	int extraLayers;
 
 	int maxSL;
 	std::vector<double> layerBounds;
+	std::vector<int> layerSL;
 
-	void generateLayerBounds();
+	void generateNextSL();
 };
 

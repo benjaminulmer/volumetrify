@@ -37,19 +37,13 @@ Program::Program() {
 // Called to start the program. Conducts set up then enters the main loop
 void Program::start() {	
 
-	DGGS_3D dg(false, 350, 1.0, 100.0);
+	DGGS_3D dg(true, 18, 1.0, 100.0);
 	//std::cout.precision(17);
+	std::cout << dg.layer(50.0, 25) << std::endl;
 
-
-	for (double num = 0.0; num <= 100.0; num += 5.0) {
-
-		int index = dg.layer(num, 3);
-
-		double other = (index == 0) ? 0.0 : dg.layerBounds[index - 1];
-
-		std::cout << index << ":  " << other << " < " << num << " <= " << dg.layerBounds[index] <<  "\t:\t" << ((other < num) && (num <= dg.layerBounds[index])) << std::endl;
-
-	}
+	//for (int i = 0; i < dg.layerSurfaceSL.size(); i++) {
+	//	std::cout << i << ": " << dg.layerSurfaceSL[i] << std::endl;
+	//}
 
 	//std::cout << "Lyr\tDp\tBnd\tSG\tSGC\tEnd" << std::endl << "--------------------------------------------" << std::endl;
 	//int n = 2;
@@ -58,7 +52,7 @@ void Program::start() {
 	//	LayerInfo i = dg.layerInfo(j);
 	//	std::cout << j << ":\t"<< i.depth << "\t" << i.boundary << "\t" << i.degen << "\t" << i.degenChild << "\t" << i.end << std::endl;
 	//}
-	system("pause");
+	//system("pause");
 
 
 	setupWindow();
