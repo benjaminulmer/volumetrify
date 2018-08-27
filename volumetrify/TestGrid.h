@@ -35,6 +35,8 @@ struct TriCell {
 
 	std::vector<TriCell> subdivide(bool volume) const;
 	void fillRenderable(Renderable& r, const glm::vec3& colour, bool curved) const;
+
+	double volume() const;
 };
 
 class TestGrid {

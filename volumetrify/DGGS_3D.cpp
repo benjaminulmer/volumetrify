@@ -239,9 +239,9 @@ std::vector<int> DGGS_3D::childrenLayers(int layer, const LayerInfo& info) {
 
 // Returns the layers neighbour (above and below) the given layer
 //
-// return - pair containing the ID of neighbour layers. -1 if given neighbour does not exist
 // first - layer above (larger radius)
 // second - layer below (smaller radius)
+// return - pair containing the ID of neighbour layers. -1 if given neighbour does not exist
 std::pair<int, int> DGGS_3D::neighbourLayers(int layer, const LayerInfo & info) {
 
 	int above = (info.end) ? -1 : layer + 1;

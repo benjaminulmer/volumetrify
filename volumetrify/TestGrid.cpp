@@ -214,17 +214,51 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 	glm::dvec3 o(0.0);
 
 	if (curved) {
-		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v1) * RAD * maxRad, o, r);
-		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
-		Geometry::createArcR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+		r.drawMode = GL_TRIANGLES;
+		r.verts.push_back(tri.v0 * maxRad);
+		r.verts.push_back(tri.v1 * maxRad);
+		r.verts.push_back(tri.v2 * maxRad);
 
-		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v1) * RAD * minRad, o, r);
-		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
-		Geometry::createArcR(glm::normalize(tri.v1) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+		r.verts.push_back(tri.v0 * maxRad);
+		r.verts.push_back(tri.v1 * maxRad);
+		r.verts.push_back(tri.v0 * minRad);
 
-		Geometry::createLineR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v0) * RAD * minRad, r);
-		Geometry::createLineR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v1) * RAD * minRad, r);
-		Geometry::createLineR(glm::normalize(tri.v2) * RAD * maxRad, glm::normalize(tri.v2) * RAD * minRad, r);
+		r.verts.push_back(tri.v0 * minRad);
+		r.verts.push_back(tri.v1 * minRad);
+		r.verts.push_back(tri.v1 * maxRad);
+
+		r.verts.push_back(tri.v1 * maxRad);
+		r.verts.push_back(tri.v2 * maxRad);
+		r.verts.push_back(tri.v1 * minRad);
+
+		r.verts.push_back(tri.v1 * minRad);
+		r.verts.push_back(tri.v2 * minRad);
+		r.verts.push_back(tri.v2 * maxRad);
+
+		r.verts.push_back(tri.v2 * maxRad);
+		r.verts.push_back(tri.v0 * maxRad);
+		r.verts.push_back(tri.v2 * minRad);
+
+		r.verts.push_back(tri.v2 * minRad);
+		r.verts.push_back(tri.v0 * minRad);
+		r.verts.push_back(tri.v0 * maxRad);
+
+		for (int i = 0; i < 21; i++) {
+			r.colours.push_back(colour);
+		}
+
+
+		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v1) * RAD * maxRad, o, r);
+		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+		//Geometry::createArcR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+
+		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v1) * RAD * minRad, o, r);
+		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+		//Geometry::createArcR(glm::normalize(tri.v1) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+
+		//Geometry::createLineR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v0) * RAD * minRad, r);
+		//Geometry::createLineR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v1) * RAD * minRad, r);
+		//Geometry::createLineR(glm::normalize(tri.v2) * RAD * maxRad, glm::normalize(tri.v2) * RAD * minRad, r);
 	}
 	else {
 		Geometry::createLineR(tri.v0 * maxRad, tri.v1 * maxRad, r);
@@ -239,6 +273,17 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 		Geometry::createLineR(tri.v1 * maxRad, tri.v1 * minRad, r);
 		Geometry::createLineR(tri.v2 * maxRad, tri.v2 * minRad, r);
 	}
+}
+
+
+double TriCell::volume() const {
+
+	std::vector<SphCoord> points;
+	points.push_back(SphCoord(tri.v0));
+	points.push_back(SphCoord(tri.v1));
+	points.push_back(SphCoord(tri.v2));
+
+	return SphCoord::volumeCell(points, maxRad, minRad);
 }
 
 

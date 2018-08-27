@@ -37,9 +37,9 @@ Program::Program() {
 // Called to start the program. Conducts set up then enters the main loop
 void Program::start() {	
 
-	DGGS_3D dg(true, 18, 1.0, 100.0);
+	//DGGS_3D dg(true, 18, 1.0, 100.0);
 	//std::cout.precision(17);
-	std::cout << dg.layer(50.0, 25) << std::endl;
+	//std::cout << dg.layer(50.0, 25) << std::endl;
 
 	//for (int i = 0; i < dg.layerSurfaceSL.size(); i++) {
 	//	std::cout << i << ": " << dg.layerSurfaceSL[i] << std::endl;
@@ -94,24 +94,78 @@ void Program::start() {
 void Program::updateRenderable() {
 
 	grid.clear();
-	//system("cls");
 
 	const auto& map = (volume) ? v.map : g.map;
+
+	//double max = -1.0;
+	//double min = 999999.0;
+	//for (auto p : map) {
+	//	if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
+
+	//	double v = p.second.volume();
+	//	max = (v > max) ? v : max;
+	//	min = (v < min) ? v : min;
+	//}
+
+	//for (auto p : map) {
+	//	if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
+
+	//	double v = p.second.volume();
+	//	glm::vec3 colour;
+
+	//	// If all volumes the same return grey
+	//	if (max == min) {
+	//		colour = glm::vec3(0.5f, 0.5f, 0.5f);
+	//	}
+
+	//	// Set colour
+	//	if ((v / max) > 0.999f && (v / max) < 1.001f) {
+	//		colour = glm::vec3(1.f, 0.f, 0.f);
+	//	}
+	//	else if ((v / min) > 0.999f && (v / min) < 1.001f) {
+	//		colour = glm::vec3(0.f, 0.f, 1.f);
+	//	}
+	//	else {
+	//		float norm = (v - min) / (max - min);
+	//		colour = glm::vec3(norm, norm, norm);
+	//	}
+
+	//	p.second.fillRenderable(grid, colour, curved);
+	//}
+
+
+	double mean = 0.0;
+	int n = 0;
 	for (auto p : map) {
 		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
-
-		p.second.fillRenderable(grid, glm::vec3(0.f, 0.f, 0.f), curved);
-
-		if (p.second.minRad > pow(0.5, sl)) {
-
-			std::vector<SphCoord> points;
-			points.push_back(p.second.tri.v0);
-			points.push_back(p.second.tri.v1);
-			points.push_back(p.second.tri.v2);
-			//std::cout << SphCoord::volumeCell(points, p.second.maxRad, p.second.minRad) << std::endl;
-		}
+		mean += p.second.volume();
+		n++;
 	}
+	mean /= n;
 
+	double sd = 0.0;
+	for (auto p : map) {
+		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
+		double v = p.second.volume();
+		sd += (v - mean) * (v - mean);
+	}
+	sd = sqrt(sd / n);
+
+	for (auto p : map) {
+		if (p.first.length() != sl + 1 || (p.first[0] != 'a' && !fullSphere)) continue;
+		double v = p.second.volume();
+		glm::vec3 colour;
+
+		double z = (v - mean) / sd;
+		if (z > 0.0) {
+			colour = glm::vec3(0.3 * z, 0.0, 0.0);
+		}
+		else {
+			colour = glm::vec3(0.0, 0.0, 0.3 * -z);
+		}
+		p.second.fillRenderable(grid, colour, curved);
+	}
+	std::cout << mean << " : " << sd << std::endl;
 	grid.doubleToFloats();
 	RenderEngine::setBufferData(grid, false);
 }
