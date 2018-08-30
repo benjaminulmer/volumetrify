@@ -33,7 +33,7 @@ public:
 	std::vector<glm::vec3> colours;
 	std::vector<glm::vec2> uvs;
 
-	//glm::mat4 model;
+	glm::dmat4 model;
 
 	glm::vec3 lineColour;
 

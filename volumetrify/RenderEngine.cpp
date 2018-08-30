@@ -9,7 +9,7 @@
 #include "ShaderTools.h"
 #include "Texture.h"
 
-RenderEngine::RenderEngine(SDL_Window* window) : window(window), fade(true) {
+RenderEngine::RenderEngine(SDL_Window* window) : window(window), fade(false) {
 
 	SDL_GetWindowSize(window, &width, &height);
 
@@ -28,7 +28,7 @@ RenderEngine::RenderEngine(SDL_Window* window) : window(window), fade(true) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glPointSize(30.f);
-	glLineWidth(1.5f);
+	glLineWidth(2.f);
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 }
 
@@ -41,12 +41,12 @@ void RenderEngine::render(const std::vector<const Renderable*>& objects, const g
 	for (const Renderable* r : objects) {	
 		glBindVertexArray(r->vao);
 
-		glm::dmat4 modelViewD = view;
+		glm::dmat4 modelViewD = view * r->model;
 
 		glm::dmat4 inv = glm::inverse(modelViewD);
 		glm::dvec3 eyePos = inv[3];
 
-		modelViewD[3] = glm::dvec4(0.0, 0.0, 0.0, 1.0);
+		//modelViewD[3] = glm::dvec4(0.0, 0.0, 0.0, 1.0);
 
 		glm::mat4 modelView = modelViewD;
 

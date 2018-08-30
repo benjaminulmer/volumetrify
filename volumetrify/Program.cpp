@@ -3,6 +3,7 @@
 
 #include <GL/glew.h>
 #include <glm/gtx/intersect.hpp>
+#include <glm/gtx/transform.hpp>
 #include <SDL2/SDL_opengl.h>
 
 #include <algorithm>
@@ -15,8 +16,8 @@
 #include "InputHandler.h"
 #include "SphCoord.h"
 #include "Geometry.h"
-
-Program::Program() {
+#define _N 200
+Program::Program() : g(_N), v(_N) {
 
 	window = nullptr;
 	renderEngine = nullptr;
@@ -69,6 +70,7 @@ void Program::start() {
 
 	// Assign buffers
 	RenderEngine::assignBuffers(grid, false);
+	RenderEngine::assignBuffers(ref, false);
 
 	// Set starting radius
 	scale = 1.0;
@@ -87,6 +89,32 @@ void Program::start() {
 	}
 	updateRenderable();
 
+	Tri start(_N);
+	ref.verts.push_back(start.v0);
+	ref.verts.push_back(start.v1);
+	ref.verts.push_back(start.v2);
+
+	ref.verts.push_back(start.v0);
+	ref.verts.push_back(start.v1);
+	ref.verts.push_back(glm::vec3(0.f));
+
+	ref.verts.push_back(start.v1);
+	ref.verts.push_back(start.v2);
+	ref.verts.push_back(glm::vec3(0.f));
+
+	ref.verts.push_back(start.v2);
+	ref.verts.push_back(start.v0);
+	ref.verts.push_back(glm::vec3(0.f));
+
+	for (int i = 0; i < 12; i++) {
+		ref.colours.push_back(glm::vec3(0.8));
+	}
+	ref.doubleToFloats();
+	RenderEngine::setBufferData(ref, false);
+	ref.drawMode = GL_TRIANGLES;
+	ref.model = glm::translate(glm::vec3(0.f, 0.5f * 6371000.0 * (4.0 / 3.0), 0.f)) * glm::scale(glm::vec3(0.99f, 0.999f, 0.99f)) * glm::translate(glm::vec3(0.f, -0.5f * 6371000.0 * (4.0 / 3.0), 0.f));
+
+	objects.push_back(&ref);
 	mainLoop();
 }
 
@@ -157,13 +185,29 @@ void Program::updateRenderable() {
 		glm::vec3 colour;
 
 		double z = (v - mean) / sd;
+		float sat = 0.f;
+		float light = 0.5f;
+		int hue = 0;
+
 		if (z > 0.0) {
-			colour = glm::vec3(0.3 * z, 0.0, 0.0);
+			hue = 0;
+			sat = 0.3 * z;
+			float c = (1.f - abs(2.f * light - 1.f)) * sat;
+			int h = hue / 60;
+			float x = c * (1.f - abs(h % 2 - 1));
+			float m = light - 0.5f * c;
+			colour = glm::vec3(c + m, x + m, m);
 		}
 		else {
-			colour = glm::vec3(0.0, 0.0, 0.3 * -z);
+			hue = 250;
+			sat = 0.3 * -z;
+			float c = (1.f - abs(2.f * light - 1.f)) * sat;
+			int h = hue / 60;
+			float x = c * (1.f - abs(h % 2 - 1));
+			float m = light - 0.5f * c;
+			colour = glm::vec3(x + m, m, c + m);
 		}
-		p.second.fillRenderable(grid, colour, curved);
+		p.second.fillRenderable(grid, glm::vec3(0.f), curved);
 	}
 	std::cout << mean << " : " << sd << std::endl;
 	grid.doubleToFloats();

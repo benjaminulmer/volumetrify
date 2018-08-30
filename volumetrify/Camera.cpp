@@ -10,9 +10,11 @@
 Camera::Camera() : zoomScale(1.3), rotScale(0.008) {
 	reset();
 }
-
+#include <iostream>
 // Returns view matrix for the camera
 glm::dmat4 Camera::getLookAt() const {
+
+	std::cout << "Scale: " << curScale << "\tLong: " << longitudeRotRad << "\tLat: " << latitudeRotRad << "\tTrans: " << translation.x << ", " << translation.y << ", " << translation.z << std::endl;
 
 	// Rotate eye along longitude
 	glm::dvec3 eyeTemp = glm::rotateY(eye, -longitudeRotRad);
@@ -113,21 +115,31 @@ void Camera::reset() {
 	up = glm::dvec3(0.0, 1.0, 0.0);
 	centre = glm::dvec3(0.0, 0.0, 0.0);
 
-	bool side = true;
-
-	if (side) {
-		// Side
-		longitudeRotRad = 1.62316;
-		latitudeRotRad = 0.0;
-		translation = glm::dvec3(2.47295, 6.70685, 5.38065);
-	}
-	else {
-		// Face
-		longitudeRotRad = -0.593408;
-		latitudeRotRad = 0.863938;
-		translation = glm::dvec3(2.9946, 7.7957, 3.83579);
-	}
-	longitudeRotRad = 0.0;
+	longitudeRotRad = 1.62316;
 	latitudeRotRad = 0.0;
-	translation = glm::dvec3(0.0);
+	translation = glm::dvec3(2.47295, 6.70685, 5.38065);
+
+	longitudeRotRad = -0.593408;
+	latitudeRotRad = 0.863938;
+	translation = glm::dvec3(2.9946, 7.7957, 3.83579);
+
+	longitudeRotRad = -1.05592;
+	latitudeRotRad = 0.253073;
+	translation = glm::dvec3(-1.17255, 5.42163, -0.794411);
+
+	longitudeRotRad = -1.065465;
+	latitudeRotRad = 0.436333;
+	translation = glm::dvec3(-1.72643, 6.78067, -1.10433);
+
+	longitudeRotRad = 1.0472;
+	latitudeRotRad = 1.570796;
+	translation = glm::dvec3(1.4, 0.0, -0.8);
+
+	longitudeRotRad = 0.218166;
+	latitudeRotRad = 0.383972;
+	translation = glm::dvec3(0.216706, 5.39621, -3.07148);
+
+	longitudeRotRad = 0.322886;
+	latitudeRotRad = 0.558505;
+	translation = glm::dvec3(0.578206, 6.45964, -3.31619);
 }

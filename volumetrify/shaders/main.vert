@@ -24,7 +24,7 @@ void main(void) {
 	vec3 highDiff = t1 + t2;
 	vec3 lowDiff = t2 - (highDiff - t1);
 
-	vec3 vertex = highDiff + lowDiff;
+	vec3 vertex = vertexHigh;//highDiff + lowDiff;
 
 	C = colour;
 	UV = uv;

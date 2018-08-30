@@ -22,6 +22,8 @@ struct Tri {
 	glm::dvec3 v1;
 	glm::dvec3 v2;
 
+	int sl = 0;
+
 	std::array<Tri, 4> fourToOne() const;
 	std::array<Tri, 9> nineToOne() const;
 };
@@ -42,7 +44,7 @@ struct TriCell {
 class TestGrid {
 
 public:
-	TestGrid();
+	TestGrid(int n);
 
 	void subdivide(bool volume);
 

@@ -67,21 +67,25 @@ std::array<Tri, 4> Tri::fourToOne() const {
 	toReturn[0].v0 = v0;
 	toReturn[0].v1 = mid01;
 	toReturn[0].v2 = mid02;
+	toReturn[0].sl = sl + 1;
 
 	toReturn[1] = Tri();
 	toReturn[1].v0 = v1;
 	toReturn[1].v1 = mid01;
 	toReturn[1].v2 = mid12;
+	toReturn[1].sl = sl + 1;
 
 	toReturn[2] = Tri();
 	toReturn[2].v0 = v2;
 	toReturn[2].v1 = mid02;
 	toReturn[2].v2 = mid12;
+	toReturn[2].sl = sl + 1;
 
 	toReturn[3] = Tri();
 	toReturn[3].v0 = mid01;
 	toReturn[3].v1 = mid02;
 	toReturn[3].v2 = mid12;
+	toReturn[3].sl = sl + 1;
 
 	return toReturn;
 }
@@ -283,14 +287,18 @@ double TriCell::volume() const {
 	points.push_back(SphCoord(tri.v1));
 	points.push_back(SphCoord(tri.v2));
 
-	return SphCoord::volumeCell(points, maxRad, minRad);
+	//return SphCoord::volumeCell(points, maxRad, minRad);
+
+	double target = 4 * M_PI / 20;
+	double thisV = target / pow(4, tri.sl);
+	return thisV * (pow(maxRad, 3) - pow(minRad, 3)) / 3.0;
 }
 
 
 // Dummy constructor for testing
-TestGrid::TestGrid() {
+TestGrid::TestGrid(int n) {
 
-	Tri t(18);
+	Tri t(n);
 	TriCell cell;
 	cell.tri = t;
 	cell.maxRad = 1.0;

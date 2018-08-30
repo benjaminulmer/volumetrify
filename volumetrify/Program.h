@@ -51,6 +51,7 @@ private:
 	Camera* camera;
 
 	Renderable grid;
+	Renderable ref;
 
 	std::vector<const Renderable*> objects;
 
