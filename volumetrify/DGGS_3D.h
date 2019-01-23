@@ -3,7 +3,7 @@
 #include <vector>
 
 struct LayerInfo {
-	int depth;
+	int depth; // depth in layer tree
 	int boundary; // might not be needed, already know surface SL for each layer
 	bool degen;
 	bool degenChild;
@@ -33,10 +33,10 @@ private:
 	int degenChildren;
 	int extraLayers;
 
-	int maxSL;
+	int maxDepth;
 	std::vector<double> layerBounds;
-	std::vector<int> layerSL;
+	std::vector<int> layerSL; // surface SL for layer
 
-	void generateNextSL();
+	void generateNextDepth();
 };
 

@@ -112,6 +112,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 			double radSplit;
 			if (volume) {
 				radSplit = pow((pow(maxRad, 3) + pow(minRad, 3)) / 2.0, 1.0 / 3.0);
+				radSplit = 0.5 * radSplit + 0.5 * midRad;
 			}
 			else {
 				radSplit = midRad;
@@ -146,7 +147,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 
 		// Find number of layers to split upper region into to satisfy:
 		// sqrt(sa) == depth of cell
-		double numLayers = ratio / (2.0 * sqrt(sa));
+		double numLayers = 1.0 * ratio / (2.0 * sqrt(sa));
 
 		// Upper region is too long and skinny: split upper region into one or more layers
 		if (numLayers > 0.75) {
@@ -164,6 +165,13 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 					upperRad = prevLower;
 					// Equal cell volume formula
 					lowerRad = (n == 0.0) ? midRad : pow((n * pow(prevLower, 3) + pow(midRad, 3)) / (1 + n), 1.0 / 3.0);
+					//prevLower = lowerRad;
+
+					double u2 = (numLayersR - i - 1) / numLayersR;
+					double l2 = (i + 1) / numLayersR;
+
+					double lowerRadM = u2 * maxRad + l2 * midRad;
+					lowerRad = lowerRad * 0.5 + lowerRadM * 0.5;
 					prevLower = lowerRad;
 				}
 				else {
@@ -174,8 +182,9 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 					double u2 = (numLayersR - i - 1) / numLayersR;
 					double l2 = (i + 1) / numLayersR;
 
-					upperRad = u1 * maxRad + l1 * midRad;
+					upperRad = prevLower;
 					lowerRad = u2 * maxRad + l2 * midRad;
+					prevLower = lowerRad;
 				}
 
 				TriCell cell = *this;
@@ -218,51 +227,51 @@ void TriCell::fillRenderable(Renderable& r, const glm::vec3 & colour, bool curve
 	glm::dvec3 o(0.0);
 
 	if (curved) {
-		r.drawMode = GL_TRIANGLES;
-		r.verts.push_back(tri.v0 * maxRad);
-		r.verts.push_back(tri.v1 * maxRad);
-		r.verts.push_back(tri.v2 * maxRad);
+		//r.drawMode = GL_TRIANGLES;
+		//r.verts.push_back(tri.v0 * maxRad);
+		//r.verts.push_back(tri.v1 * maxRad);
+		//r.verts.push_back(tri.v2 * maxRad);
 
-		r.verts.push_back(tri.v0 * maxRad);
-		r.verts.push_back(tri.v1 * maxRad);
-		r.verts.push_back(tri.v0 * minRad);
+		//r.verts.push_back(tri.v0 * maxRad);
+		//r.verts.push_back(tri.v1 * maxRad);
+		//r.verts.push_back(tri.v0 * minRad);
 
-		r.verts.push_back(tri.v0 * minRad);
-		r.verts.push_back(tri.v1 * minRad);
-		r.verts.push_back(tri.v1 * maxRad);
+		//r.verts.push_back(tri.v0 * minRad);
+		//r.verts.push_back(tri.v1 * minRad);
+		//r.verts.push_back(tri.v1 * maxRad);
 
-		r.verts.push_back(tri.v1 * maxRad);
-		r.verts.push_back(tri.v2 * maxRad);
-		r.verts.push_back(tri.v1 * minRad);
+		//r.verts.push_back(tri.v1 * maxRad);
+		//r.verts.push_back(tri.v2 * maxRad);
+		//r.verts.push_back(tri.v1 * minRad);
 
-		r.verts.push_back(tri.v1 * minRad);
-		r.verts.push_back(tri.v2 * minRad);
-		r.verts.push_back(tri.v2 * maxRad);
+		//r.verts.push_back(tri.v1 * minRad);
+		//r.verts.push_back(tri.v2 * minRad);
+		//r.verts.push_back(tri.v2 * maxRad);
 
-		r.verts.push_back(tri.v2 * maxRad);
-		r.verts.push_back(tri.v0 * maxRad);
-		r.verts.push_back(tri.v2 * minRad);
+		//r.verts.push_back(tri.v2 * maxRad);
+		//r.verts.push_back(tri.v0 * maxRad);
+		//r.verts.push_back(tri.v2 * minRad);
 
-		r.verts.push_back(tri.v2 * minRad);
-		r.verts.push_back(tri.v0 * minRad);
-		r.verts.push_back(tri.v0 * maxRad);
+		//r.verts.push_back(tri.v2 * minRad);
+		//r.verts.push_back(tri.v0 * minRad);
+		//r.verts.push_back(tri.v0 * maxRad);
 
-		for (int i = 0; i < 21; i++) {
-			r.colours.push_back(colour);
-		}
+		//for (int i = 0; i < 21; i++) {
+		//	r.colours.push_back(colour);
+		//}
 
 
-		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v1) * RAD * maxRad, o, r);
-		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
-		//Geometry::createArcR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v1) * RAD * maxRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v2) * RAD * maxRad, o, r);
 
-		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v1) * RAD * minRad, o, r);
-		//Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
-		//Geometry::createArcR(glm::normalize(tri.v1) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v1) * RAD * minRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v0) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
+		Geometry::createArcR(glm::normalize(tri.v1) * RAD * minRad, glm::normalize(tri.v2) * RAD * minRad, o, r);
 
-		//Geometry::createLineR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v0) * RAD * minRad, r);
-		//Geometry::createLineR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v1) * RAD * minRad, r);
-		//Geometry::createLineR(glm::normalize(tri.v2) * RAD * maxRad, glm::normalize(tri.v2) * RAD * minRad, r);
+		Geometry::createLineR(glm::normalize(tri.v0) * RAD * maxRad, glm::normalize(tri.v0) * RAD * minRad, r);
+		Geometry::createLineR(glm::normalize(tri.v1) * RAD * maxRad, glm::normalize(tri.v1) * RAD * minRad, r);
+		Geometry::createLineR(glm::normalize(tri.v2) * RAD * maxRad, glm::normalize(tri.v2) * RAD * minRad, r);
 	}
 	else {
 		Geometry::createLineR(tri.v0 * maxRad, tri.v1 * maxRad, r);

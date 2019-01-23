@@ -8,15 +8,17 @@
 
 #include <algorithm>
 #include <cmath>
-#include <limits>
+#include <fstream>
+#include <unordered_set>
 #include <iostream>
+#include <limits>
 
 #include "Constants.h"
 #include "ContentReadWrite.h"
 #include "InputHandler.h"
 #include "SphCoord.h"
 #include "Geometry.h"
-#define _N 200
+#define _N 20
 Program::Program() : g(_N), v(_N) {
 
 	window = nullptr;
@@ -107,17 +109,23 @@ void Program::start() {
 	ref.verts.push_back(glm::vec3(0.f));
 
 	for (int i = 0; i < 12; i++) {
-		ref.colours.push_back(glm::vec3(0.8));
+		ref.colours.push_back(glm::vec3(1.0));
 	}
 	ref.doubleToFloats();
 	RenderEngine::setBufferData(ref, false);
 	ref.drawMode = GL_TRIANGLES;
-	ref.model = glm::translate(glm::vec3(0.f, 0.5f * 6371000.0 * (4.0 / 3.0), 0.f)) * glm::scale(glm::vec3(0.99f, 0.999f, 0.99f)) * glm::translate(glm::vec3(0.f, -0.5f * 6371000.0 * (4.0 / 3.0), 0.f));
+	ref.model = glm::translate(glm::vec3(0.f, 0.5f * 6371000.0 * (4.0 / 3.0), 0.f)) * glm::scale(glm::vec3(0.999f, 0.999f, 0.999f)) * glm::translate(glm::vec3(0.f, -0.5f * 6371000.0 * (4.0 / 3.0), 0.f));
 
 	objects.push_back(&ref);
 	mainLoop();
 }
 
+bool MyVec3ComparisonFunc(const glm::vec3 &vecA, const glm::vec3 &vecB)
+{
+	return vecA[0] < vecB[0]
+		&& vecA[1] < vecB[1]
+		&& vecA[2] < vecB[2];
+}
 
 void Program::updateRenderable() {
 
@@ -209,6 +217,27 @@ void Program::updateRenderable() {
 		}
 		p.second.fillRenderable(grid, glm::vec3(0.f), curved);
 	}
+
+	//if (sl == 2) {
+	//	std::ofstream out("geom.obj");
+	//	if (!out.is_open()) {
+	//		std::cout << "***** BAD *****" << std::endl;
+	//		return;
+	//	}
+	//	sort(grid.verts.begin(), grid.verts.end(), MyVec3ComparisonFunc);
+	//	grid.verts.erase(unique(grid.verts.begin(), grid.verts.end()), grid.verts.end());
+	//	//std::unordered_set<glm::vec3> set(grid.verts.begin(), grid.verts.end());
+
+	//	for (const glm::vec3& v : grid.verts) {
+	//		out << "v " << v.x / 6000000.0 << " " << v.y / 6000000.0 << " " << v.z / 6000000.0 << std::endl;
+	//	}
+
+	//	out.close();
+
+	//}
+
+
+
 	std::cout << mean << " : " << sd << std::endl;
 	grid.doubleToFloats();
 	RenderEngine::setBufferData(grid, false);

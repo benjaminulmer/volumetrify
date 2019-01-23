@@ -14,15 +14,15 @@ DGGS_3D::DGGS_3D(bool volume, int numInitialFaces, double surfaceRadialRatio, do
 
 	layerBounds.push_back(gridRadius);
 	layerSL.push_back(0);
-	maxSL = 0;
+	maxDepth = 0;
 }
 
 
 // Generate layers for the next level of subdivision
-void DGGS_3D::generateNextSL() {
+void DGGS_3D::generateNextDepth() {
 
 	int start = 0;
-	for (int i = 0; i < maxSL; i++) {
+	for (int i = 0; i < maxDepth; i++) {
 		start = 2 * start + extraLayers * i + 1;
 	}
 	int numElements = layerBounds.size() - start;
@@ -84,7 +84,7 @@ void DGGS_3D::generateNextSL() {
 		layerSL.push_back(layerSL[start + i] + 1); // surface subivision
 		layerSL.push_back(layerSL[start + i] + 1); // surface subivision
 	}
-	maxSL++;
+	maxDepth++;
 }
 
 
@@ -93,21 +93,21 @@ void DGGS_3D::generateNextSL() {
 // radius - target radius
 // SL - target subdivision level
 // return - layer ID
-int DGGS_3D::layer(double radius, int SL) {
+int DGGS_3D::layer(double radius, int depth) {
 
 	// Generate necessary number of SL
-	while (maxSL < SL) {
-		generateNextSL();
+	while (maxDepth < depth) {
+		generateNextDepth();
 	}
 
 	// Find starting index in list
 	int start = 0;
-	for (int i = 0; i < SL; i++) {
+	for (int i = 0; i < depth; i++) {
 		start = 2 * start + extraLayers * i + 1;
 	}
 
 	int first = start - 1;
-	int last = layerBounds.size() - 1;
+	int last = layerBounds.size() - 1; // this is probably wrong - what if SL < maxSL
 	int mid;
 
 	// Binary search to find layer that contains radius
@@ -194,7 +194,7 @@ LayerInfo DGGS_3D::layerInfo(int layer) {
 // layer - ID of the target layer
 // info - info about the target layer
 // return - ID of parent layer
-int DGGS_3D::parentLayer(int layer, const LayerInfo & info) {
+int DGGS_3D::parentLayer(int layer, const LayerInfo& info) {
 
 	if (layer == 0) {
 		return -1;
@@ -242,7 +242,7 @@ std::vector<int> DGGS_3D::childrenLayers(int layer, const LayerInfo& info) {
 // first - layer above (larger radius)
 // second - layer below (smaller radius)
 // return - pair containing the ID of neighbour layers. -1 if given neighbour does not exist
-std::pair<int, int> DGGS_3D::neighbourLayers(int layer, const LayerInfo & info) {
+std::pair<int, int> DGGS_3D::neighbourLayers(int layer, const LayerInfo& info) {
 
 	int above = (info.end) ? -1 : layer + 1;
 	int below = (info.degen) ? -1 : layer - 1;

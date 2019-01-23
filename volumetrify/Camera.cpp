@@ -135,11 +135,26 @@ void Camera::reset() {
 	latitudeRotRad = 1.570796;
 	translation = glm::dvec3(1.4, 0.0, -0.8);
 
-	longitudeRotRad = 0.218166;
-	latitudeRotRad = 0.383972;
-	translation = glm::dvec3(0.216706, 5.39621, -3.07148);
+	// 200 skewed
+	longitudeRotRad = 0.820304;
+	latitudeRotRad = 0.654498;
+	translation = glm::dvec3(2.40908, 6.76859, -2.30227);
 
 	longitudeRotRad = 0.322886;
 	latitudeRotRad = 0.558505;
 	translation = glm::dvec3(0.578206, 6.45964, -3.31619);
+
+	longitudeRotRad = 0.218166;
+	latitudeRotRad = 0.383972;
+	translation = glm::dvec3(0.216706, 5.39621, -3.07148);
+
+	// 20 skewed
+	longitudeRotRad = 0.733038;
+	latitudeRotRad = 0.427605;
+	translation = glm::dvec3(1.71190, 5.94776, -2.26126);
+
+	// side 
+	longitudeRotRad = -1.0472;
+	latitudeRotRad = -0.261799;
+	translation = glm::dvec3(0.0, 6.46, 0.0);
 }
