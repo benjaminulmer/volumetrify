@@ -153,7 +153,12 @@ void Camera::reset() {
 	latitudeRotRad = 0.427605;
 	translation = glm::dvec3(1.71190, 5.94776, -2.26126);
 
-	// side 
+	// 200 side 
+	longitudeRotRad = -1.0472;
+	latitudeRotRad = -0.253072;
+	translation = glm::dvec3(0.0, 6.17, 0.0);
+
+	// 20 side 
 	longitudeRotRad = -1.0472;
 	latitudeRotRad = -0.261799;
 	translation = glm::dvec3(0.0, 6.46, 0.0);

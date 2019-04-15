@@ -90,6 +90,64 @@ std::array<Tri, 4> Tri::fourToOne() const {
 	return toReturn;
 }
 
+// Four to one surface subdivision for a triangle
+std::array<Tri, 2> Tri::twoToOne() const {
+
+	std::array<Tri, 2> toReturn;
+
+	double e0 = glm::length(v0 - v1);
+	double e1 = glm::length(v0 - v2);
+	double e2 = glm::length(v2 - v1);
+
+	if (e0 >= e1 && e0 >= e2) {
+		glm::dvec3 mid01 = 0.5 * v0 + 0.5 * v1;
+
+		toReturn[0] = Tri();
+		toReturn[0].v0 = v0;
+		toReturn[0].v1 = v2;
+		toReturn[0].v2 = mid01;
+		toReturn[0].sl = sl + 1;
+
+		toReturn[1] = Tri();
+		toReturn[1].v0 = v1;
+		toReturn[1].v1 = v2;
+		toReturn[1].v2 = mid01;
+		toReturn[1].sl = sl + 1;
+	}
+	else if (e1 >= e2) {
+		glm::dvec3 mid02 = 0.5 * v0 + 0.5 * v2;
+
+		toReturn[0] = Tri();
+		toReturn[0].v0 = v0;
+		toReturn[0].v1 = v1;
+		toReturn[0].v2 = mid02;
+		toReturn[0].sl = sl + 1;
+
+		toReturn[1] = Tri();
+		toReturn[1].v0 = v2;
+		toReturn[1].v1 = v1;
+		toReturn[1].v2 = mid02;
+		toReturn[1].sl = sl + 1;
+	}
+	else {
+		glm::dvec3 mid12 = 0.5 * v1 + 0.5 * v2;
+
+		toReturn[0] = Tri();
+		toReturn[0].v0 = v1;
+		toReturn[0].v1 = v0;
+		toReturn[0].v2 = mid12;
+		toReturn[0].sl = sl + 1;
+
+		toReturn[1] = Tri();
+		toReturn[1].v0 = v2;
+		toReturn[1].v1 = v0;
+		toReturn[1].v2 = mid12;
+		toReturn[1].sl = sl + 1;
+	}
+
+	return toReturn;
+}
+
 
 // Subdivide TriCell into its children. Properly adapts to size of triangle
 // Currently assumes 1-4 surface subdivision scheme.
@@ -98,7 +156,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 	double ratio = 1.0;
 
 	std::vector<TriCell> toReturn;
-	std::array<Tri, 4> children = tri.fourToOne();
+	std::array<Tri, 2> children = tri.twoToOne();
 	char num = 'a';
 
 	double midRad = 0.5 * maxRad + 0.5 * minRad;
@@ -137,6 +195,8 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 	}
 	// In SG case treat cell as upper and lower region made by splitting along radial midpoint
 	else {
+
+		//std::vector<TriCell> temp;
 
 		// Caculate spherical area of triangle
 		std::vector<SphCoord> points;
@@ -206,7 +266,23 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 				top.cellType = CT::NG;
 				top.code = code + std::string(1, num++);
 				toReturn.push_back(top);
+				//temp.push_back(top);
 			}
+			//for (const TriCell& tCell : temp) {
+
+			//	std::array<Tri, 4> c = tCell.tri.fourToOne();
+
+			//	for (const Tri& t : c) {
+
+			//		TriCell top;
+			//		top.tri = t;
+			//		top.maxRad = maxRad;
+			//		top.minRad = midRad;
+			//		top.cellType = CT::NG;
+			//		top.code = code + std::string(1, num++);
+			//		toReturn.push_back(top);
+			//	}
+			//}
 		}
 
 		// Bottom region is not modified
@@ -215,6 +291,18 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 		bottom.cellType = CT::SG;
 		bottom.code = code + std::string(1, num++);
 		toReturn.push_back(bottom);
+
+		//for (const Tri& t : children) {
+
+		//	TriCell top;
+		//	top.tri = t;
+		//	top.maxRad = midRad;
+		//	top.minRad = minRad;
+		//	top.cellType = CT::NG;
+		//	top.code = code + std::string(1, num++);
+		//	toReturn.push_back(top);
+		//	//temp.push_back(top);
+		//}
 	}
 	return toReturn;
 }

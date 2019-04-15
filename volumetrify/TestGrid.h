@@ -24,6 +24,7 @@ struct Tri {
 
 	int sl = 0;
 
+	std::array<Tri, 2> twoToOne() const;
 	std::array<Tri, 4> fourToOne() const;
 	std::array<Tri, 9> nineToOne() const;
 };
