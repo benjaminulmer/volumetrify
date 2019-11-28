@@ -156,7 +156,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 	double ratio = 1.0;
 
 	std::vector<TriCell> toReturn;
-	std::array<Tri, 2> children = tri.twoToOne();
+	std::array<Tri, 4> children = tri.fourToOne();
 	char num = 'a';
 
 	double midRad = 0.5 * maxRad + 0.5 * minRad;
@@ -164,6 +164,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 	if (cellType == CT::NG) {
 
 		// Split all surface children once along radial direction
+		int i = 0;
 		for (const Tri& t : children) {
 
 			// Splitting point changes if we want equal volume
@@ -191,6 +192,8 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 			bottom.cellType = CT::NG;
 			bottom.code = code + std::string(1, num++);
 			toReturn.push_back(bottom);
+
+			i++;
 		}
 	}
 	// In SG case treat cell as upper and lower region made by splitting along radial midpoint
@@ -257,6 +260,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 		}
 		// Upper region is too short and fat: surface subdivide upper region
 		else {
+			int i = 0;
 			for (const Tri& t : children) {
 
 				TriCell top;
@@ -267,6 +271,7 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 				top.code = code + std::string(1, num++);
 				toReturn.push_back(top);
 				//temp.push_back(top);
+				i++;
 			}
 			//for (const TriCell& tCell : temp) {
 
@@ -286,23 +291,23 @@ std::vector<TriCell> TriCell::subdivide(bool volume) const {
 		}
 
 		// Bottom region is not modified
-		TriCell bottom = *this;
-		bottom.maxRad = midRad;
-		bottom.cellType = CT::SG;
-		bottom.code = code + std::string(1, num++);
-		toReturn.push_back(bottom);
+		//TriCell bottom = *this;
+		//bottom.maxRad = midRad;
+		//bottom.cellType = CT::SG;
+		//bottom.code = code + std::string(1, num++);
+		//toReturn.push_back(bottom);
 
-		//for (const Tri& t : children) {
+		for (const Tri& t : children) {
 
-		//	TriCell top;
-		//	top.tri = t;
-		//	top.maxRad = midRad;
-		//	top.minRad = minRad;
-		//	top.cellType = CT::NG;
-		//	top.code = code + std::string(1, num++);
-		//	toReturn.push_back(top);
-		//	//temp.push_back(top);
-		//}
+			TriCell top;
+			top.tri = t;
+			top.maxRad = midRad;
+			top.minRad = minRad;
+			top.cellType = CT::NG;
+			top.code = code + std::string(1, num++);
+			toReturn.push_back(top);
+			//temp.push_back(top);
+		}
 	}
 	return toReturn;
 }

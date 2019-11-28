@@ -83,6 +83,7 @@ void Program::start() {
 
 	// Draw stuff
 	grid.drawMode = GL_LINES;
+	grid.model = glm::mat4(1.f);
 
 	// Subdivide grid and create renderable
 	for (int i = 0; i < maxSL; i++) {
@@ -108,6 +109,7 @@ void Program::start() {
 	ref.verts.push_back(start.v0);
 	ref.verts.push_back(glm::vec3(0.f));
 
+
 	for (int i = 0; i < 12; i++) {
 		ref.colours.push_back(glm::vec3(1.0));
 	}
@@ -116,7 +118,7 @@ void Program::start() {
 	ref.drawMode = GL_TRIANGLES;
 	ref.model = glm::translate(glm::vec3(0.f, 0.5f * 6371000.0 * (4.0 / 3.0), 0.f)) * glm::scale(glm::vec3(0.999f, 0.999f, 0.999f)) * glm::translate(glm::vec3(0.f, -0.5f * 6371000.0 * (4.0 / 3.0), 0.f));
 
-	objects.push_back(&ref);
+	//objects.push_back(&ref);
 	mainLoop();
 }
 

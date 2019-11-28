@@ -34,7 +34,7 @@ private:
 	SDL_Window* window;
 	int width, height;
 
-	const double fovYRad = 60.f * ((float)M_PI / 180.f);
+	const double fovYRad = 60.f * ((float)3.14159 / 180.f);
 	const double near = 1.f;
 	const double far = 1000.f;
 
